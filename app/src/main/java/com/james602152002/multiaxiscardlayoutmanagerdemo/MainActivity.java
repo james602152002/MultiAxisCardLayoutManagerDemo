@@ -8,14 +8,19 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.SparseArray;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.james602152002.multiaxiscardlayoutmanager.MultiAxisCardLayoutManager;
-import com.james602152002.multiaxiscardlayoutmanagerdemo.adapter.CardAdapter;
+import com.james602152002.multiaxiscardlayoutmanager.adapter.MultiAxisCardAdapter;
+import com.james602152002.multiaxiscardlayoutmanager.interfaces.ViewHolderCallBack;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.item_decoration.CardDecoration;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -49,12 +54,45 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void initView() {
         recyclerView = findViewById(R.id.recycler_view);
-        recyclerView.setLayoutManager(new MultiAxisCardLayoutManager(this));
+        recyclerView.setLayoutManager(new MultiAxisCardLayoutManager(recyclerView));
         recyclerView.addItemDecoration(new CardDecoration());
-        recyclerView.setAdapter(new CardAdapter(this));
+//        recyclerView.setAdapter(new CardAdapter(this));
+
+        recyclerView.setAdapter(new MultiAxisCardAdapter(this, fetchData(), R.layout.card_cell, R.layout.card_cell, new ViewHolderCallBack() {
+            @Override
+            public void horizontalViewCallBack(int position) {
+
+            }
+
+            @Override
+            public void verticalViewCallBack(int position) {
+
+            }
+        }));
 
         FloatingActionButton actionButton = findViewById(R.id.action_btn);
         actionButton.setOnClickListener(this);
+    }
+
+    private SparseArray<Object> fetchData() {
+        SparseArray<Object> data = new SparseArray<>();
+        for (int i = 0; i < 10; i++) {
+            switch (i % 3) {
+                case 2:
+                    List<Object> list = new ArrayList<>();
+                    list.add(new Object());
+                    list.add(new Object());
+                    list.add(new Object());
+                    list.add(new Object());
+                    data.put(i, list);
+                    break;
+                default:
+                    data.put(i, new Object());
+                    break;
+            }
+
+        }
+        return data;
     }
 
     @Override

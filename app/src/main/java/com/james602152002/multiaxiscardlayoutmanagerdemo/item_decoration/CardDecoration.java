@@ -4,6 +4,8 @@ import android.graphics.Rect;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
+import com.james602152002.multiaxiscardlayoutmanager.viewholder.HorizontalCardViewHolder;
+
 /**
  * Created by shiki60215 on 18-1-31.
  */
@@ -15,9 +17,15 @@ public class CardDecoration extends RecyclerView.ItemDecoration {
         final short margin = 10;
         final int dp_margin = dp2px(view, margin);
         int position = parent.getChildAdapterPosition(view);
-        outRect.left = dp_margin << 1;
+        RecyclerView.ViewHolder holder = parent.getChildViewHolder(view);
+        if (holder instanceof HorizontalCardViewHolder) {
+            outRect.left = dp_margin;
+            outRect.right = dp_margin;
+        } else {
+            outRect.left = dp_margin;
+            outRect.right = dp_margin;
+        }
         outRect.top = position != 0 ? dp_margin : (dp_margin << 1);
-        outRect.right = dp_margin << 1;
         outRect.bottom = position != parent.getAdapter().getItemCount() - 1 ? dp_margin :
                 (dp_margin << 1);
     }

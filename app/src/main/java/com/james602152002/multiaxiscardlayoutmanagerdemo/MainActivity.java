@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         recyclerView.addItemDecoration(new CardDecoration());
 //        recyclerView.setAdapter(new CardAdapter(this));
 
-        recyclerView.setAdapter(new MultiAxisCardAdapter(this, fetchData(), R.layout.card_cell, R.layout.card_cell, new ViewHolderCallBack() {
+        recyclerView.setAdapter(new MultiAxisCardAdapter(this, fetchData(), R.layout.card_cell, R.layout.horizontal_card, new ViewHolderCallBack() {
             @Override
             public void horizontalViewCallBack(int position) {
 

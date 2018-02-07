@@ -15,7 +15,8 @@ public class CardDecoration extends RecyclerView.ItemDecoration {
     public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
         super.getItemOffsets(outRect, view, parent, state);
         final short margin = 10;
-        final int dp_margin = dp2px(view, margin);
+//        final int dp_margin = dp2px(view, margin);
+        int dp_margin = 20;
         int position = parent.getChildAdapterPosition(view);
         RecyclerView.ViewHolder holder = parent.getChildViewHolder(view);
         if (holder instanceof HorizontalCardViewHolder) {

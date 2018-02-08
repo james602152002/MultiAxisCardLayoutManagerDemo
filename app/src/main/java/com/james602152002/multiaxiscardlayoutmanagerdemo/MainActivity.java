@@ -50,6 +50,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         view.addView(text_view);
         mToolbar.addView(view);
         initView();
+
+//        AppBarLayout appBarLayout = findViewById(R.id.appbar);
+//        appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
+//            @Override
+//            public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+//                Log.i("", "verticalOffset ========== " + verticalOffset);
+//                Log.i("", "appBarLayout.getTotalScrollRange() ========= "+appBarLayout.getTotalScrollRange() );
+//            }
+//        });
     }
 
     private void initView() {

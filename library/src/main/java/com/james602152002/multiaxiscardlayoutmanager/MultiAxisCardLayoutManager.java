@@ -114,7 +114,8 @@ public class MultiAxisCardLayoutManager extends RecyclerView.LayoutManager imple
             return;
         }
         //onLayoutChildren方法在RecyclerView 初始化时 会执行两遍
-        detachAndScrapAttachedViews(recycler);
+//        detachAndScrapAttachedViews(recycler);
+        removeAndRecycleAllViews(recycler);
 
         //初始化区域
         mVerticalOffset = 0;

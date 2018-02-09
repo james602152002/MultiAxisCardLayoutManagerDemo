@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private SparseArray<Object> fetchData() {
         SparseArray<Object> data = new SparseArray<>();
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 1000; i++) {
             switch (i % 3) {
                 case 2:
                     List<Object> list = new ArrayList<>();

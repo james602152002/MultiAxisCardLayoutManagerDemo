@@ -27,7 +27,7 @@ public class CardDecoration extends RecyclerView.ItemDecoration {
             outRect.right = dp_margin;
         }
         outRect.top = position != 0 ? dp_margin : (dp_margin << 1);
-        outRect.top = 0;
+//        outRect.top = 0;
         outRect.bottom = position != parent.getAdapter().getItemCount() - 1 ? dp_margin :
                 (dp_margin << 1);
     }

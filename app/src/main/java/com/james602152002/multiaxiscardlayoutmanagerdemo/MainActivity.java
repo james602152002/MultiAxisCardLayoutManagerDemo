@@ -50,22 +50,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         view.addView(text_view);
         mToolbar.addView(view);
         initView();
-
-//        AppBarLayout appBarLayout = findViewById(R.id.appbar);
-//        appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
-//            @Override
-//            public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
-//                Log.i("", "verticalOffset ========== " + verticalOffset);
-//                Log.i("", "appBarLayout.getTotalScrollRange() ========= "+appBarLayout.getTotalScrollRange() );
-//            }
-//        });
     }
 
     private void initView() {
         recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new MultiAxisCardLayoutManager(recyclerView));
         recyclerView.addItemDecoration(new CardDecoration());
-//        recyclerView.setAdapter(new CardAdapter(this));
 
         recyclerView.setAdapter(new MultiAxisCardAdapter(this, fetchData(), R.layout.card_cell, R.layout.horizontal_card, new ViewHolderCallBack() {
             @Override

@@ -3,8 +3,10 @@ package com.james602152002.multiaxiscardlayoutmanager;
 import android.graphics.Rect;
 import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.MotionEvent;
 import android.view.View;
@@ -462,15 +464,22 @@ public class MultiAxisCardLayoutManager extends RecyclerView.LayoutManager imple
                 touching_horizontal_cards = isTouchingHorizontalCard(downX, downY + mVerticalOffset);
                 break;
             case MotionEvent.ACTION_MOVE:
-                if (!scrolling && touching_horizontal_cards && !sliding_horizontal_cards)
+                if (!scrolling && touching_horizontal_cards && !sliding_horizontal_cards) {
+                    Log.i("", "touching_horizontal_cards");
                     if (Math.abs(event.getX() - downX) > touchSlop) {
                         sliding_horizontal_cards = true;
                     }
+                }
+                if (sliding_horizontal_cards) {
+                    Log.i("", "disable nested scrolling !!!!!!!!!!!!");
+                    ViewCompat.setNestedScrollingEnabled(recyclerView, false);
+                }
                 break;
             case MotionEvent.ACTION_CANCEL:
             case MotionEvent.ACTION_UP:
                 touching_horizontal_cards = false;
                 horizontal_card_rect = null;
+                ViewCompat.setNestedScrollingEnabled(recyclerView, true);
                 break;
         }
         return false;

@@ -465,7 +465,7 @@ public class MultiAxisCardLayoutManager extends RecyclerView.LayoutManager imple
                 break;
             case MotionEvent.ACTION_MOVE:
                 if (!scrolling && touching_horizontal_cards && !sliding_horizontal_cards) {
-                    Log.i("", "touching_horizontal_cards");
+                    Log.i("", "touching_horizontal_cards ------ " + (Math.abs(event.getX() - downX)));
                     if (Math.abs(event.getX() - downX) > touchSlop) {
                         sliding_horizontal_cards = true;
                     }

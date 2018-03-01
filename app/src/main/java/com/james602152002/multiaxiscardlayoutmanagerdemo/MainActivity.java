@@ -15,8 +15,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.james602152002.multiaxiscardlayoutmanager.MultiAxisCardLayoutManager;
-import com.james602152002.multiaxiscardlayoutmanager.adapter.MultiAxisCardAdapter;
-import com.james602152002.multiaxiscardlayoutmanager.interfaces.ViewHolderCallBack;
+import com.james602152002.multiaxiscardlayoutmanagerdemo.adapter.CardAdapter;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.item_decoration.CardDecoration;
 
 import java.util.ArrayList;
@@ -57,17 +56,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         recyclerView.setLayoutManager(new MultiAxisCardLayoutManager(recyclerView));
         recyclerView.addItemDecoration(new CardDecoration());
 
-        recyclerView.setAdapter(new MultiAxisCardAdapter(this, fetchData(), R.layout.card_cell, R.layout.horizontal_card, new ViewHolderCallBack() {
-            @Override
-            public void horizontalViewCallBack(int position) {
-
-            }
-
-            @Override
-            public void verticalViewCallBack(int position) {
-
-            }
-        }));
+        recyclerView.setAdapter(new CardAdapter(this, fetchData(), R.layout.card_cell, R.layout.horizontal_card));
 
         FloatingActionButton actionButton = findViewById(R.id.action_btn);
         actionButton.setOnClickListener(this);

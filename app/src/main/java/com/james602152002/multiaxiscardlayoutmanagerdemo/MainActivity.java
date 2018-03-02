@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import com.james602152002.multiaxiscardlayoutmanager.MultiAxisCardLayoutManager;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.adapter.CardAdapter;
+import com.james602152002.multiaxiscardlayoutmanagerdemo.bean.BeanHorizontalCards;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.item_decoration.CardDecoration;
 
 import java.util.ArrayList;
@@ -65,13 +66,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private SparseArray<Object> fetchData() {
         SparseArray<Object> data = new SparseArray<>();
         for (int i = 0; i < 1000; i++) {
-            switch (i % 3) {
-                case 2:
-                    List<Object> list = new ArrayList<>();
-                    list.add(new Object());
-                    list.add(new Object());
-                    list.add(new Object());
-                    list.add(new Object());
+            switch (i % 2) {
+                case 1:
+                    List<BeanHorizontalCards> list = new ArrayList<>();
+                    BeanHorizontalCards item = new BeanHorizontalCards();
+                    item.setUri("http://img4.imgtn.bdimg.com/it/u=3750011819,3893667393&fm=27&gp=0.jpg");
+                    item.setTitle("Nier Automata Photo 1");
+                    list.add(item);
+                    item = new BeanHorizontalCards();
+                    item.setUri("https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=2485596028,71439047&fm=27&gp=0.jpg");
+                    item.setTitle("Nier Automata Photo 2");
+                    list.add(item);
+                    item = new BeanHorizontalCards();
+                    item.setUri("http://img3.imgtn.bdimg.com/it/u=624862191,3362962092&fm=27&gp=0.jpg");
+                    item.setTitle("Nier Automata Photo 3");
+                    list.add(item);
+                    item = new BeanHorizontalCards();
+                    item.setUri("https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=2602427892,3990550605&fm=27&gp=0.jpg");
+                    item.setTitle("Nier Automata Photo 4");
+                    list.add(item);
                     data.put(i, list);
                     break;
                 default:

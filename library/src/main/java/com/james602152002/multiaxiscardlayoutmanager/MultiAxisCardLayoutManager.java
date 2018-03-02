@@ -462,6 +462,7 @@ public class MultiAxisCardLayoutManager extends RecyclerView.LayoutManager imple
                 }
                 if (sliding_horizontal_cards) {
                     scrollHorizontalBy((int) (moveX - event.getX()));
+//                    recyclerView.invalidate();
                     moveX = event.getX();
                     recyclerView.setNestedScrollingEnabled(false);
                 }

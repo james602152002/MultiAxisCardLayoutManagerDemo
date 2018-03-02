@@ -48,7 +48,7 @@ public class CardAdapter extends MultiAxisCardAdapter {
         }
 
         @Override
-        public void initView(int position) {
+        public void initView(int v_card_position, int h_card_position) {
             photo.setImageURI("http://img0.imgtn.bdimg.com/it/u=4163071673,1446070271&fm=27&gp=0.jpg");
         }
     }

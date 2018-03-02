@@ -30,7 +30,7 @@ public class CardAdapter extends MultiAxisCardAdapter {
     public BaseCardViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         switch (viewType) {
             case TYPE_VERTICAL:
-                return new VerticalCardViewHolder(inflater.inflate(vertical_view_id, parent, false));
+                return new V_TitleViewHolder(inflater.inflate(vertical_view_id, parent, false));
             case TYPE_HORIZONTAL:
                 return new H_PhotoCardViewHolder(inflater.inflate(horizontal_view_id, parent, false));
         }
@@ -56,9 +56,23 @@ public class CardAdapter extends MultiAxisCardAdapter {
         @Override
         public void initView(int v_card_position, int h_card_position) {
             final List<BeanHorizontalCards> h_items = (List<BeanHorizontalCards>) items.get(v_card_position);
-            final BeanHorizontalCards item =  h_items.get(h_card_position);
+            final BeanHorizontalCards item = h_items.get(h_card_position);
             photo.setImageURI(item.getUri());
             title.setText(item.getTitle());
+        }
+    }
+
+    class V_TitleViewHolder extends VerticalCardViewHolder {
+        AppCompatTextView title;
+
+        public V_TitleViewHolder(View itemView) {
+            super(itemView);
+            title = itemView.findViewById(R.id.title);
+        }
+
+        @Override
+        public void initView(int v_card_position, int h_card_position) {
+            title.setText((String) items.get(v_card_position));
         }
     }
 }

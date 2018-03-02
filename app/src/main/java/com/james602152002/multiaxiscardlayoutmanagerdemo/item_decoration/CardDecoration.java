@@ -21,15 +21,16 @@ public class CardDecoration extends RecyclerView.ItemDecoration {
         RecyclerView.ViewHolder holder = parent.getChildViewHolder(view);
         if (holder instanceof HorizontalCardViewHolder) {
             outRect.left = dp_margin;
+            outRect.top = 0;
             outRect.right = dp_margin;
+            outRect.bottom = 0;
         } else {
             outRect.left = dp_margin;
+            outRect.top = position != 0 ? dp2px(view,2) : 40;
             outRect.right = dp_margin;
+            outRect.bottom = position != parent.getAdapter().getItemCount() - 1 ? dp2px(view,2) :
+                    20;
         }
-        outRect.top = position != 0 ? dp_margin : (dp_margin << 1);
-//        outRect.top = 0;
-        outRect.bottom = position != parent.getAdapter().getItemCount() - 1 ? dp_margin :
-                (dp_margin << 1);
     }
 
     private int dp2px(View view, float dpValue) {

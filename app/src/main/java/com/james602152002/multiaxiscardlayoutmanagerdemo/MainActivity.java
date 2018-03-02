@@ -65,6 +65,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private SparseArray<Object> fetchData() {
         SparseArray<Object> data = new SparseArray<>();
+        int j = 0;
         for (int i = 0; i < 1000; i++) {
             switch (i % 2) {
                 case 1:
@@ -88,7 +89,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     data.put(i, list);
                     break;
                 default:
-                    data.put(i, new Object());
+                    switch (j % 2) {
+                        case 1:
+                            data.put(i, "Notification");
+                            break;
+                        default:
+                            data.put(i, "News");
+                            break;
+                    }
+                    j++;
                     break;
             }
 

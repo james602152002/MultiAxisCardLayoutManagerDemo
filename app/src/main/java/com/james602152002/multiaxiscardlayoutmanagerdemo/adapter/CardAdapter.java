@@ -71,7 +71,7 @@ public class CardAdapter extends MultiAxisCardAdapter implements View.OnClickLis
             photo.setImageURI(item.getUri());
             title.setText(item.getTitle());
             convertView.setTag(item);
-//            bindOnClickListener(convertView);
+            convertView.setOnClickListener(CardAdapter.this);
         }
     }
 
@@ -101,11 +101,8 @@ public class CardAdapter extends MultiAxisCardAdapter implements View.OnClickLis
             destIntent.putExtra("title", ((BeanHorizontalCards) item).getTitle());
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 Window window = activity.getWindow();
-//                window.setSharedElementExitTransition(new ChangeBounds());
-//                window.setSharedElementEnterTransition(new ChangeBounds());
                 window.setSharedElementEnterTransition(DraweeTransition.createTransitionSet(ScalingUtils.ScaleType.CENTER_CROP, ScalingUtils.ScaleType.FIT_CENTER));
                 window.setSharedElementReturnTransition(DraweeTransition.createTransitionSet(ScalingUtils.ScaleType.FIT_CENTER, ScalingUtils.ScaleType.CENTER_CROP));
-//                window.setExitTransition(null);
                 final View photo = view.findViewById(R.id.photo);
                 activity.setExitSharedElementCallback(new SharedElementCallback() {
 
@@ -120,8 +117,6 @@ public class CardAdapter extends MultiAxisCardAdapter implements View.OnClickLis
                         for (View view : sharedElements) {
                             if (view == photo) {
                                 view.setVisibility(View.VISIBLE);
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-                                    view.setTransitionName(null);
                             }
                         }
                     }

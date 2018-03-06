@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.SparseArray;
 import android.view.Gravity;
@@ -14,7 +13,7 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.james602152002.multiaxiscardlayoutmanager.MultiAxisCardLayoutManager;
+import com.james602152002.multiaxiscardlayoutmanager.ui.CardRecyclerView;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.adapter.CardAdapter;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.bean.BeanHorizontalCards;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.item_decoration.CardDecoration;
@@ -24,15 +23,19 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private RecyclerView recyclerView;
+    private CardRecyclerView recyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        initToolBar();
+        initView();
+    }
+
+    private void initToolBar() {
         CollapsingToolbarLayout mCToolbarLayout = findViewById(R.id.collapsing_toolbar_layout);
         Toolbar mToolbar = findViewById(R.id.toolbar);
-
         mCToolbarLayout.setCollapsedTitleTextColor(0);
         mCToolbarLayout.setExpandedTitleColor(0);
         // Set the support action bar
@@ -49,12 +52,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         text_view.setGravity(Gravity.CENTER_VERTICAL);
         view.addView(text_view);
         mToolbar.addView(view);
-        initView();
     }
 
     private void initView() {
         recyclerView = findViewById(R.id.recycler_view);
-        recyclerView.setLayoutManager(new MultiAxisCardLayoutManager(recyclerView));
+//        recyclerView.setLayoutManager(new MultiAxisCardLayoutManager(recyclerView));
         recyclerView.addItemDecoration(new CardDecoration());
 
         recyclerView.setAdapter(new CardAdapter(this, fetchData(), R.layout.card_cell, R.layout.horizontal_card));

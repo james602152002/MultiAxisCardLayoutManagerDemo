@@ -18,6 +18,7 @@ import com.james602152002.multiaxiscardlayoutmanager.ui.CardRecyclerView;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.adapter.CardAdapter;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.bean.BeanHorizontalCards;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.item_decoration.CardDecoration;
+import com.james602152002.multiaxiscardlayoutmanagerdemo.util.DiffCallBackUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -116,32 +117,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch (v.getId()) {
             case R.id.action_btn:
                 final SparseArray<Object> oldData = new SparseArray<>();
-                for(int i = 0 ; i < mData.size(); i++) {
+                for (int i = 0; i < mData.size(); i++) {
                     oldData.put(i, mData.get(i));
                 }
                 fetchData();
 
-                DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffUtil.Callback() {
-                    @Override
-                    public int getOldListSize() {
-                        return oldData.size();
-                    }
-
-                    @Override
-                    public int getNewListSize() {
-                        return mData.size();
-                    }
-
-                    @Override
-                    public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
-                        return oldData.get(oldItemPosition) == mData.get(newItemPosition);
-                    }
-
-                    @Override
-                    public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
-                        return true;
-                    }
-                }, true);
+                DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffCallBackUtil(oldData, mData), true);
                 diffResult.dispatchUpdatesTo(mAdapter);
                 break;
         }

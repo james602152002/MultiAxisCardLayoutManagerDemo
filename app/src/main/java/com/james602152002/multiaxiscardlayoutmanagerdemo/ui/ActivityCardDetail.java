@@ -27,7 +27,6 @@ public class ActivityCardDetail extends BaseActivity {
         initToolBar();
         SimpleDraweeView image = findViewById(R.id.toolbar_image);
         image.setImageURI(getIntent().getStringExtra("uri"));
-//        image.setImageURI("http://img4.imgtn.bdimg.com/it/u=3750011819,3893667393&fm=27&gp=0.jpg");
     }
 
     private void initToolBar() {

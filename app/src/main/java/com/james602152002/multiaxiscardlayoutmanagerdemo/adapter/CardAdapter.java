@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatTextView;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
 import android.view.ViewGroup;
@@ -101,8 +102,10 @@ public class CardAdapter extends MultiAxisCardAdapter implements View.OnClickLis
             destIntent.putExtra("title", ((BeanHorizontalCards) item).getTitle());
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 Window window = activity.getWindow();
-                window.setSharedElementEnterTransition(DraweeTransition.createTransitionSet(ScalingUtils.ScaleType.CENTER_CROP, ScalingUtils.ScaleType.FIT_CENTER));
-                window.setSharedElementReturnTransition(DraweeTransition.createTransitionSet(ScalingUtils.ScaleType.FIT_CENTER, ScalingUtils.ScaleType.CENTER_CROP));
+                window.setSharedElementEnterTransition(DraweeTransition.createTransitionSet(
+                        ScalingUtils.ScaleType.CENTER_CROP, ScalingUtils.ScaleType.CENTER_CROP));
+                window.setSharedElementEnterTransition(DraweeTransition.createTransitionSet(
+                        ScalingUtils.ScaleType.CENTER_CROP, ScalingUtils.ScaleType.CENTER_CROP));
                 final View photo = view.findViewById(R.id.photo);
                 activity.setExitSharedElementCallback(new SharedElementCallback() {
 
@@ -116,12 +119,14 @@ public class CardAdapter extends MultiAxisCardAdapter implements View.OnClickLis
 
                         for (View view : sharedElements) {
                             if (view == photo) {
+                                Log.i("","share element !!!!!!!!!!!!!!!!!!!!!!!!!!!!11");
                                 view.setVisibility(View.VISIBLE);
                             }
                         }
                     }
                 });
                 photo.setTransitionName("photo");
+                view.findViewById(R.id.title).setTransitionName("title");
                 activity.startActivity(destIntent, ActivityOptions.makeSceneTransitionAnimation(activity, photo, "photo").toBundle());
             } else {
                 activity.startActivity(destIntent);

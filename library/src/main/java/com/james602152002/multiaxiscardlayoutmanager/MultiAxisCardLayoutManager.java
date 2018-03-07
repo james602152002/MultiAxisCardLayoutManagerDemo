@@ -23,11 +23,11 @@ import java.lang.reflect.Field;
 
 public class MultiAxisCardLayoutManager extends RecyclerView.LayoutManager {
 
-    private int mVerticalOffset;//竖直偏移量 每次换行时，要根据这个offset判断
-    private int mFirstVisiPos;//屏幕可见的第一个View的Position
-    private int mLastVisiPos;//屏幕可见的最后一个View的Position
+    private int mVerticalOffset;
+    private int mFirstVisiPos;
+    private int mLastVisiPos;
 
-    private SparseArray<Rect> mItemRects;//key 是View的position，保存View的bounds 和 显示标志，
+    private SparseArray<Rect> mItemRects;
     private SparseArray<Rect> horizontalCardItemRects;
     private SparseArray<View> horizontalCards;
 
@@ -44,11 +44,15 @@ public class MultiAxisCardLayoutManager extends RecyclerView.LayoutManager {
     private short layout_times = 0;
 
     public MultiAxisCardLayoutManager(@NonNull CardRecyclerView recyclerView) {
-        setAutoMeasureEnabled(true);
         mItemRects = new SparseArray<>();
         horizontalCardItemRects = new SparseArray<>();
         horizontalCards = new SparseArray<>();
         this.recyclerView = recyclerView;
+    }
+
+    @Override
+    public boolean isAutoMeasureEnabled() {
+        return true;
     }
 
     @Override

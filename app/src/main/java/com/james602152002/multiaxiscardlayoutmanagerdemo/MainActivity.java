@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.Toolbar;
 import android.util.SparseArray;
 import android.view.Gravity;
@@ -24,6 +25,8 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private CardRecyclerView recyclerView;
+    private SparseArray<Object> mData = new SparseArray<>();
+    private CardAdapter mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,14 +61,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         recyclerView = findViewById(R.id.recycler_view);
 //        recyclerView.setLayoutManager(new MultiAxisCardLayoutManager(recyclerView));
         recyclerView.addItemDecoration(new CardDecoration());
-
-        recyclerView.setAdapter(new CardAdapter(this, fetchData(), R.layout.card_cell, R.layout.horizontal_card));
+        fetchData();
+        mAdapter = new CardAdapter(this, mData, R.layout.card_cell, R.layout.horizontal_card);
+        recyclerView.setAdapter(mAdapter);
 
         FloatingActionButton actionButton = findViewById(R.id.action_btn);
         actionButton.setOnClickListener(this);
     }
 
-    private SparseArray<Object> fetchData() {
+    private void fetchData() {
         SparseArray<Object> data = new SparseArray<>();
         int j = 0;
         for (int i = 0; i < 1000; i++) {
@@ -102,15 +106,44 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     j++;
                     break;
             }
-
         }
-        return data;
+        for (int i = 0; i < data.size(); i++) {
+            mData.put(mData.size(), data.get(i));
+        }
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.action_btn:
+                final SparseArray<Object> oldData = new SparseArray<>();
+                for(int i = 0 ; i < mData.size(); i++) {
+                    oldData.put(i, mData.get(i));
+                }
+                fetchData();
+
+                DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffUtil.Callback() {
+                    @Override
+                    public int getOldListSize() {
+                        return oldData.size();
+                    }
+
+                    @Override
+                    public int getNewListSize() {
+                        return mData.size();
+                    }
+
+                    @Override
+                    public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+                        return oldData.get(oldItemPosition) == mData.get(newItemPosition);
+                    }
+
+                    @Override
+                    public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+                        return true;
+                    }
+                }, true);
+                diffResult.dispatchUpdatesTo(mAdapter);
                 break;
         }
     }

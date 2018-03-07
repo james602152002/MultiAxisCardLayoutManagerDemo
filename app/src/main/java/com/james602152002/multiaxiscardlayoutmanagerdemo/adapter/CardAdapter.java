@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatTextView;
-import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
 import android.view.ViewGroup;
@@ -119,7 +118,6 @@ public class CardAdapter extends MultiAxisCardAdapter implements View.OnClickLis
 
                         for (View view : sharedElements) {
                             if (view == photo) {
-                                Log.i("","share element !!!!!!!!!!!!!!!!!!!!!!!!!!!!11");
                                 view.setVisibility(View.VISIBLE);
                             }
                         }

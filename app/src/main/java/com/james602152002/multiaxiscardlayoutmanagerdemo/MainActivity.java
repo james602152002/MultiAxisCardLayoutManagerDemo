@@ -59,7 +59,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void initView() {
         recyclerView = findViewById(R.id.recycler_view);
-//        recyclerView.setLayoutManager(new MultiAxisCardLayoutManager(recyclerView));
         recyclerView.addItemDecoration(new CardDecoration());
         fetchData();
         mAdapter = new CardAdapter(this, mData, R.layout.card_cell, R.layout.horizontal_card);
@@ -72,7 +71,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void fetchData() {
         SparseArray<Object> data = new SparseArray<>();
         int j = 0;
-        for (int i = 0; i < 1000; i++) {
+        for (int i = 0; i < 4; i++) {
             switch (i % 2) {
                 case 1:
                     List<BeanHorizontalCards> list = new ArrayList<>();

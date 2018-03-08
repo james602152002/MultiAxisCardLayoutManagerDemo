@@ -29,9 +29,9 @@ import java.util.List;
  * Created by shiki60215 on 18-3-1.
  */
 
-public class CardAdapter extends MultiAxisCardAdapter implements View.OnClickListener {
+public class HomepageCardAdapter extends MultiAxisCardAdapter implements View.OnClickListener {
 
-    public CardAdapter(Context context, SparseArray<Object> items, int vertical_view_id, int horizontal_view_id) {
+    public HomepageCardAdapter(Context context, SparseArray<Object> items, int vertical_view_id, int horizontal_view_id) {
         super(context, items, vertical_view_id, horizontal_view_id);
     }
 
@@ -53,13 +53,11 @@ public class CardAdapter extends MultiAxisCardAdapter implements View.OnClickLis
 
     class H_PhotoCardViewHolder extends HorizontalCardViewHolder {
 
-        private View convertView;
         private SimpleDraweeView photo;
         private AppCompatTextView title;
 
         public H_PhotoCardViewHolder(View itemView) {
             super(itemView);
-            convertView = itemView;
             photo = itemView.findViewById(R.id.photo);
             title = itemView.findViewById(R.id.title);
         }
@@ -70,8 +68,8 @@ public class CardAdapter extends MultiAxisCardAdapter implements View.OnClickLis
             final BeanHorizontalCards item = h_items.get(h_card_position);
             photo.setImageURI(item.getUri());
             title.setText(item.getTitle());
-            convertView.setTag(item);
-            convertView.setOnClickListener(CardAdapter.this);
+            itemView.setTag(item);
+            itemView.setOnClickListener(HomepageCardAdapter.this);
         }
     }
 
@@ -106,6 +104,8 @@ public class CardAdapter extends MultiAxisCardAdapter implements View.OnClickLis
                 window.setSharedElementEnterTransition(DraweeTransition.createTransitionSet(
                         ScalingUtils.ScaleType.CENTER_CROP, ScalingUtils.ScaleType.CENTER_CROP));
                 final View photo = view.findViewById(R.id.photo);
+                final View title = view.findViewById(R.id.title);
+                title.setVisibility(View.INVISIBLE);
                 activity.setExitSharedElementCallback(new SharedElementCallback() {
 
                     @Override
@@ -119,12 +119,12 @@ public class CardAdapter extends MultiAxisCardAdapter implements View.OnClickLis
                         for (View view : sharedElements) {
                             if (view == photo) {
                                 view.setVisibility(View.VISIBLE);
+                                title.setVisibility(View.VISIBLE);
                             }
                         }
                     }
                 });
                 photo.setTransitionName("photo");
-                view.findViewById(R.id.title).setTransitionName("title");
                 activity.startActivity(destIntent, ActivityOptions.makeSceneTransitionAnimation(activity, photo, "photo").toBundle());
             } else {
                 activity.startActivity(destIntent);

@@ -10,7 +10,7 @@ import com.james602152002.multiaxiscardlayoutmanager.viewholder.HorizontalCardVi
  * Created by shiki60215 on 18-1-31.
  */
 
-public class CardDecoration extends RecyclerView.ItemDecoration {
+public class MultiAxisCardDecoration extends RecyclerView.ItemDecoration {
     @Override
     public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
         super.getItemOffsets(outRect, view, parent, state);

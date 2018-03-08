@@ -15,9 +15,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.james602152002.multiaxiscardlayoutmanager.ui.CardRecyclerView;
-import com.james602152002.multiaxiscardlayoutmanagerdemo.adapter.CardAdapter;
+import com.james602152002.multiaxiscardlayoutmanagerdemo.adapter.HomepageCardAdapter;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.bean.BeanHorizontalCards;
-import com.james602152002.multiaxiscardlayoutmanagerdemo.item_decoration.CardDecoration;
+import com.james602152002.multiaxiscardlayoutmanagerdemo.item_decoration.MultiAxisCardDecoration;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.util.DiffCallBackUtil;
 
 import java.util.ArrayList;
@@ -27,7 +27,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private CardRecyclerView recyclerView;
     private SparseArray<Object> mData = new SparseArray<>();
-    private CardAdapter mAdapter;
+    private HomepageCardAdapter mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,9 +60,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void initView() {
         recyclerView = findViewById(R.id.recycler_view);
-        recyclerView.addItemDecoration(new CardDecoration());
+        recyclerView.addItemDecoration(new MultiAxisCardDecoration());
         fetchData();
-        mAdapter = new CardAdapter(this, mData, R.layout.card_cell, R.layout.horizontal_card);
+        mAdapter = new HomepageCardAdapter(this, mData, R.layout.card_cell, R.layout.horizontal_card);
         recyclerView.setAdapter(mAdapter);
 
         FloatingActionButton actionButton = findViewById(R.id.action_btn);

@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.transition.ChangeBounds;
-import android.transition.Fade;
 import android.view.Window;
 
 /**
@@ -26,12 +25,10 @@ public class BaseActivity extends AppCompatActivity {
             window.setAllowEnterTransitionOverlap(true);
             window.requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
 
-            Fade fade = new Fade();
-            fade.setDuration(500);
             window.setSharedElementExitTransition(new ChangeBounds());
             window.setSharedElementEnterTransition(new ChangeBounds());
-            window.setEnterTransition(fade);
-            window.setExitTransition(fade);
+//            window.setEnterTransition(null);
+//            window.setExitTransition(null);
         }
 
         window.getDecorView().setBackgroundColor(0);

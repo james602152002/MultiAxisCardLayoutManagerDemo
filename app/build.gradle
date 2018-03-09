@@ -1,11 +1,13 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 'android-P'
+//    compileSdkVersion 'android-P'
+    compileSdkVersion 27
     defaultConfig {
         applicationId "com.james602152002.multiaxiscardlayoutmanagerdemo"
         minSdkVersion 14
-        targetSdkVersion 'P'
+//        targetSdkVersion 'P'
+        targetSdkVersion 27
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -19,8 +21,12 @@ android {
     }
 }
 
-dependencies {
+ext {
     ext.supportLibVersion = '28.0.0-alpha1'
+    supportLibVersion = '27.1.0'
+}
+
+dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation "com.android.support:appcompat-v7:${supportLibVersion}"
     implementation "com.android.support:design:${supportLibVersion}"
@@ -29,10 +35,8 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
-
     implementation project(':library')
     implementation 'com.android.support:multidex:1.0.2'
-
     //retrofit framework
     implementation 'com.squareup.retrofit2:retrofit:2.3.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.3.0'

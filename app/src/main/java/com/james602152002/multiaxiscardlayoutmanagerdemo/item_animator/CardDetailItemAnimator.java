@@ -3,6 +3,7 @@ package com.james602152002.multiaxiscardlayoutmanagerdemo.item_animator;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPropertyAnimatorCompat;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 
 /**
  * Created by shiki60215 on 18-3-7.
@@ -17,6 +18,7 @@ public class CardDetailItemAnimator extends BaseItemAnimator {
      */
     @Override
     public void setRemoveAnimation(RecyclerView.ViewHolder holder, ViewPropertyAnimatorCompat animator) {
+        Log.i("animator" , "1");
         animator.alpha(0);
     }
 
@@ -26,6 +28,7 @@ public class CardDetailItemAnimator extends BaseItemAnimator {
      */
     @Override
     public void removeAnimationEnd(RecyclerView.ViewHolder view) {
+        Log.i("animator" , "2");
         ViewCompat.setAlpha(view.itemView,1);
     }
 
@@ -35,6 +38,7 @@ public class CardDetailItemAnimator extends BaseItemAnimator {
      */
     @Override
     public void addAnimationInit(RecyclerView.ViewHolder holder) {
+        Log.i("animator" , "3");
         ViewCompat.setAlpha(holder.itemView, 0);
     }
 
@@ -45,6 +49,7 @@ public class CardDetailItemAnimator extends BaseItemAnimator {
      */
     @Override
     public void setAddAnimation(RecyclerView.ViewHolder holder,ViewPropertyAnimatorCompat animator) {
+        Log.i("animator" , "4");
         animator.alpha(1);
     }
 
@@ -54,6 +59,7 @@ public class CardDetailItemAnimator extends BaseItemAnimator {
      */
     @Override
     public void addAnimationCancel(RecyclerView.ViewHolder holder) {
+        Log.i("animator" , "5");
         ViewCompat.setAlpha(holder.itemView, 1);
     }
 
@@ -64,6 +70,7 @@ public class CardDetailItemAnimator extends BaseItemAnimator {
      */
     @Override
     public void setOldChangeAnimation(RecyclerView.ViewHolder holder, ViewPropertyAnimatorCompat animator) {
+        Log.i("animator" , "6");
         animator.alpha(0);
     }
 
@@ -73,6 +80,7 @@ public class CardDetailItemAnimator extends BaseItemAnimator {
      */
     @Override
     public void oldChangeAnimationEnd(RecyclerView.ViewHolder holder) {
+        Log.i("animator" , "7");
         ViewCompat.setAlpha(holder.itemView,1);
     }
 
@@ -82,6 +90,7 @@ public class CardDetailItemAnimator extends BaseItemAnimator {
      */
     @Override
     public void newChangeAnimationInit(RecyclerView.ViewHolder holder) {
+        Log.i("animator" , "8");
         ViewCompat.setAlpha(holder.itemView,0);
     }
 
@@ -92,6 +101,7 @@ public class CardDetailItemAnimator extends BaseItemAnimator {
      */
     @Override
     public void setNewChangeAnimation(RecyclerView.ViewHolder holder, ViewPropertyAnimatorCompat animator) {
+        Log.i("animator" , "9");
         animator.alpha(1);
     }
 
@@ -101,6 +111,7 @@ public class CardDetailItemAnimator extends BaseItemAnimator {
      */
     @Override
     public void newChangeAnimationEnd(RecyclerView.ViewHolder holder) {
+        Log.i("animator" , "10");
         ViewCompat.setAlpha(holder.itemView,1);
     }
 }

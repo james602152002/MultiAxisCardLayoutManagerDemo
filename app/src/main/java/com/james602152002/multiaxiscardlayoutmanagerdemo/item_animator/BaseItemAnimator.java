@@ -9,6 +9,8 @@ import android.support.v7.widget.SimpleItemAnimator;
  */
 
 public abstract class BaseItemAnimator extends SimpleItemAnimator {
+
+
     //业务控制是否执行该viewHolder的动画  比如通讯录列表，判断只有联
     //系人的ViewHolder执行动画，如果是分组头部ViewHolder则不执行动画
     @Override

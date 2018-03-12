@@ -84,14 +84,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     item.setUri("https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=2485596028,71439047&fm=27&gp=0.jpg");
                     item.setTitle("Nier Automata Photo 2");
                     list.add(item);
-                    item = new BeanHorizontalCards();
-                    item.setUri("http://img3.imgtn.bdimg.com/it/u=624862191,3362962092&fm=27&gp=0.jpg");
-                    item.setTitle("Nier Automata Photo 3");
-                    list.add(item);
-                    item = new BeanHorizontalCards();
-                    item.setUri("https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=2602427892,3990550605&fm=27&gp=0.jpg");
-                    item.setTitle("Nier Automata Photo 4");
-                    list.add(item);
+//                    item = new BeanHorizontalCards();
+//                    item.setUri("http://img3.imgtn.bdimg.com/it/u=624862191,3362962092&fm=27&gp=0.jpg");
+//                    item.setTitle("Nier Automata Photo 3");
+//                    list.add(item);
+//                    item = new BeanHorizontalCards();
+//                    item.setUri("https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=2602427892,3990550605&fm=27&gp=0.jpg");
+//                    item.setTitle("Nier Automata Photo 4");
+//                    list.add(item);
                     data.put(i, list);
                     break;
                 default:

@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         SparseArray<Object> data = new SparseArray<>();
         int j = 0;
         int title_position = (mData.size() >> 2) + 1;
-        for (int i = 0; i < 12; i++) {
+        for (int i = 0; i < 4; i++) {
             switch (i % 2) {
                 case 1:
                     List<BeanHorizontalCards> list = new ArrayList<>();

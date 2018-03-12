@@ -72,7 +72,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void fetchData() {
         SparseArray<Object> data = new SparseArray<>();
         int j = 0;
-        for (int i = 0; i < 4; i++) {
+        int title_position = (mData.size() >> 2) + 1;
+        for (int i = 0; i < 12; i++) {
             switch (i % 2) {
                 case 1:
                     List<BeanHorizontalCards> list = new ArrayList<>();
@@ -84,23 +85,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     item.setUri("https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=2485596028,71439047&fm=27&gp=0.jpg");
                     item.setTitle("Nier Automata Photo 2");
                     list.add(item);
-//                    item = new BeanHorizontalCards();
-//                    item.setUri("http://img3.imgtn.bdimg.com/it/u=624862191,3362962092&fm=27&gp=0.jpg");
-//                    item.setTitle("Nier Automata Photo 3");
-//                    list.add(item);
-//                    item = new BeanHorizontalCards();
-//                    item.setUri("https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=2602427892,3990550605&fm=27&gp=0.jpg");
-//                    item.setTitle("Nier Automata Photo 4");
-//                    list.add(item);
+                    item = new BeanHorizontalCards();
+                    item.setUri("http://img3.imgtn.bdimg.com/it/u=624862191,3362962092&fm=27&gp=0.jpg");
+                    item.setTitle("Nier Automata Photo 3");
+                    list.add(item);
+                    item = new BeanHorizontalCards();
+                    item.setUri("https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=2602427892,3990550605&fm=27&gp=0.jpg");
+                    item.setTitle("Nier Automata Photo 4");
+                    list.add(item);
                     data.put(i, list);
                     break;
                 default:
                     switch (j % 2) {
                         case 1:
-                            data.put(i, "Notification");
+                            data.put(i, new StringBuilder("Notification").append(title_position).toString());
+                            title_position++;
                             break;
                         default:
-                            data.put(i, "News");
+                            data.put(i, new StringBuilder("News").append(title_position).toString());
                             break;
                     }
                     j++;

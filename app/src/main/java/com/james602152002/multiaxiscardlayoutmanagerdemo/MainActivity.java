@@ -1,11 +1,9 @@
 package com.james602152002.multiaxiscardlayoutmanagerdemo;
 
 import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.Toolbar;
 import android.util.SparseArray;
@@ -18,12 +16,13 @@ import com.james602152002.multiaxiscardlayoutmanager.ui.CardRecyclerView;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.adapter.HomepageCardAdapter;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.bean.BeanHorizontalCards;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.item_decoration.MultiAxisCardDecoration;
+import com.james602152002.multiaxiscardlayoutmanagerdemo.ui.BaseActivity;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.util.DiffCallBackUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     private CardRecyclerView recyclerView;
     private SparseArray<Object> mData = new SparseArray<>();
@@ -43,10 +42,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mCToolbarLayout.setCollapsedTitleTextColor(0);
         mCToolbarLayout.setExpandedTitleColor(0);
         // Set the support action bar
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-            setSupportActionBar(mToolbar);
-        else
-            getSupportActionBar().hide();
+        initToolBar(mToolbar);
 
         LinearLayout view = new LinearLayout(this);
         view.setGravity(Gravity.CENTER_VERTICAL);

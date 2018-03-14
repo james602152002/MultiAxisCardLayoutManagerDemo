@@ -1,7 +1,6 @@
 package com.james602152002.multiaxiscardlayoutmanagerdemo.ui;
 
 import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -45,10 +44,7 @@ public class ActivityCardDetail extends BaseActivity {
         mCToolbarLayout.setCollapsedTitleTextColor(0);
         mCToolbarLayout.setExpandedTitleColor(0);
         // Set the support action bar
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-            setSupportActionBar(mToolbar);
-        else
-            getSupportActionBar().hide();
+        initToolBar(mToolbar);
 
         LinearLayout view = new LinearLayout(this);
         view.setGravity(Gravity.CENTER_VERTICAL);

@@ -56,6 +56,17 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     private void initView() {
         recyclerView = findViewById(R.id.recycler_view);
+//        // Scroll to view and run animation when scrolling completes.
+//        recyclerView.smoothScrollToPosition(0);
+//        recyclerView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+//
+//            @Override
+//            public boolean onPreDraw() {
+//                recyclerView.getViewTreeObserver().removeOnPreDrawListener(this);
+//                // Open activity here.
+//                return true;
+//            }
+//        });
         recyclerView.addItemDecoration(new MultiAxisCardDecoration());
         fetchData();
         mAdapter = new HomepageCardAdapter(this, mData, R.layout.card_cell, R.layout.horizontal_card);

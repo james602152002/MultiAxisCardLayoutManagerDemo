@@ -37,8 +37,16 @@ public class BaseActivity extends AppCompatActivity {
 
             window.setSharedElementExitTransition(new ChangeBounds());
             window.setSharedElementEnterTransition(new ChangeBounds());
-//            window.setEnterTransition(null);
-//            window.setExitTransition(null);
+
+//            Fade fade = new Fade();
+//            fade.setMode(Visibility.MODE_IN);
+//            fade.setDuration(500);
+//            fade.excludeTarget(R.id.appbar, true);
+//            fade.excludeTarget(android.R.id.statusBarBackground, true);
+//            fade.excludeTarget(android.R.id.navigationBarBackground, true);
+
+//            getWindow().setEnterTransition(fade);
+//            getWindow().setExitTransition(fade);
         }
     }
 

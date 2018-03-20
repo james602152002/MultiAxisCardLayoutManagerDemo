@@ -101,8 +101,10 @@ public class HomepageCardAdapter extends MultiAxisCardAdapter implements View.On
                 Window window = activity.getWindow();
                 window.setSharedElementEnterTransition(DraweeTransition.createTransitionSet(
                         ScalingUtils.ScaleType.CENTER_CROP, ScalingUtils.ScaleType.CENTER_CROP));
-                window.setSharedElementEnterTransition(DraweeTransition.createTransitionSet(
+                window.setSharedElementExitTransition(DraweeTransition.createTransitionSet(
                         ScalingUtils.ScaleType.CENTER_CROP, ScalingUtils.ScaleType.CENTER_CROP));
+//                window.setSharedElementEnterTransition(DraweeTransition.createTransitionSet(
+//                        ScalingUtils.ScaleType.CENTER_CROP, ScalingUtils.ScaleType.CENTER_CROP));
                 final View photo = view.findViewById(R.id.photo);
                 final View title = view.findViewById(R.id.title);
                 title.setVisibility(View.INVISIBLE);

@@ -2,7 +2,10 @@ package com.james602152002.multiaxiscardlayoutmanagerdemo.ui;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -22,12 +25,20 @@ import com.james602152002.multiaxiscardlayoutmanagerdemo.R;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.adapter.CardDetailAdapter;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.bean.BeanCardDetailListItems;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.item_decoration.CardDetailDecoration;
+import com.james602152002.multiaxiscardlayoutmanagerdemo.widget.CollapsingToolBarMaterialHeader;
+import com.scwang.smartrefresh.layout.SmartRefreshLayout;
+import com.scwang.smartrefresh.layout.api.RefreshLayout;
+import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 
 /**
  * Created by shiki60215 on 18-3-2.
  */
 
 public class ActivityCardDetail extends BaseActivity {
+
+    private SmartRefreshLayout smartRefreshLayout;
+    private final SparseArray<BeanCardDetailListItems> data = new SparseArray<>();
+    private RecyclerView recyclerView;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -59,7 +70,17 @@ public class ActivityCardDetail extends BaseActivity {
     }
 
     private void initView() {
-        final RecyclerView recyclerView = findViewById(R.id.recycler_view);
+        smartRefreshLayout = findViewById(R.id.smart_refresh_layout);
+//        smartRefreshLayout.setHeaderHeight(DensityUtil.px2dp(100) )
+        ((CollapsingToolBarMaterialHeader)findViewById(R.id.header)).setAppBarLayout((AppBarLayout) findViewById(R.id.appbar));
+        smartRefreshLayout.setOnRefreshListener(new OnRefreshListener() {
+            @Override
+            public void onRefresh(@NonNull RefreshLayout refreshLayout) {
+                fetchData();
+            }
+        });
+        smartRefreshLayout.autoRefresh();
+        recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         recyclerView.addItemDecoration(new CardDetailDecoration());
 //        recyclerView.setItemAnimator(new CardDetailItemAnimator());
@@ -74,21 +95,24 @@ public class ActivityCardDetail extends BaseActivity {
         anim.addAnimation(rotateAnim);
 
         recyclerView.setLayoutAnimation(new LayoutAnimationController(anim, 0));
-        final SparseArray<BeanCardDetailListItems> data = new SparseArray<>();
-        SparseArray<BeanCardDetailListItems> fetch_data = fetchData();
-        for (int i = 0; i < fetch_data.size(); i++) {
-            data.put(data.size(), fetch_data.get(i));
-        }
-        recyclerView.setAdapter(new CardDetailAdapter(this, data));
     }
 
-    private SparseArray<BeanCardDetailListItems> fetchData() {
-        SparseArray<BeanCardDetailListItems> items = new SparseArray<>();
-        for (int i = 0; i < 10; i++) {
-            BeanCardDetailListItems item = new BeanCardDetailListItems();
-            item.setTitle(new StringBuilder("Card Detail Title ").append(i + 1).toString());
-            items.put(i, item);
-        }
-        return items;
+    private void fetchData() {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                SparseArray<BeanCardDetailListItems> items = new SparseArray<>();
+                for (int i = 0; i < 5; i++) {
+                    BeanCardDetailListItems item = new BeanCardDetailListItems();
+                    item.setTitle(new StringBuilder("Card Detail Title ").append(i + 1).toString());
+                    items.put(i, item);
+                }
+                for (int i = 0; i < items.size(); i++) {
+                    data.put(data.size(), items.get(i));
+                }
+                smartRefreshLayout.finishRefresh();
+                recyclerView.setAdapter(new CardDetailAdapter(ActivityCardDetail.this, data));
+            }
+        }, 2000);
     }
 }

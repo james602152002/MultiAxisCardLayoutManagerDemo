@@ -22,7 +22,7 @@ android {
 }
 
 ext {
-    ext.supportLibVersion = '28.0.0-alpha1'
+//    ext.supportLibVersion = '28.0.0-alpha1'
     supportLibVersion = '27.1.0'
 }
 
@@ -35,13 +35,14 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
-//    implementation project(':library')
+    implementation project(':library')
     implementation 'com.android.support:multidex:1.0.2'
     //retrofit framework
     implementation 'com.squareup.retrofit2:retrofit:2.3.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
-
     implementation 'com.facebook.fresco:fresco:1.8.1'
     implementation 'com.kelin.translucentbar:library:0.8.0'
-    implementation 'com.github.james602152002:MultiAxisCardRecyclerView:1.0.0'
+    //    implementation 'com.github.james602152002:MultiAxisCardRecyclerView:1.0.0'
+    implementation 'com.scwang.smartrefresh:SmartRefreshLayout:1.1.0-alpha-1'
+    implementation 'com.scwang.smartrefresh:SmartRefreshHeader:1.1.0-alpha-1'
 }

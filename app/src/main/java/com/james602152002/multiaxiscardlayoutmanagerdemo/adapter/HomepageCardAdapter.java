@@ -1,5 +1,6 @@
 package com.james602152002.multiaxiscardlayoutmanagerdemo.adapter;
 
+import android.annotation.TargetApi;
 import android.app.ActivityOptions;
 import android.app.SharedElementCallback;
 import android.content.Context;
@@ -16,6 +17,8 @@ import com.facebook.drawee.drawable.ScalingUtils;
 import com.facebook.drawee.view.DraweeTransition;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.james602152002.multiaxiscardlayoutmanager.adapter.MultiAxisCardAdapter;
+import com.james602152002.multiaxiscardlayoutmanager.interfaces.ScrollAnimatorObserver;
+import com.james602152002.multiaxiscardlayoutmanager.ui.CardRecyclerView;
 import com.james602152002.multiaxiscardlayoutmanager.viewholder.BaseCardViewHolder;
 import com.james602152002.multiaxiscardlayoutmanager.viewholder.HorizontalCardViewHolder;
 import com.james602152002.multiaxiscardlayoutmanager.viewholder.VerticalCardViewHolder;
@@ -89,48 +92,61 @@ public class HomepageCardAdapter extends MultiAxisCardAdapter implements View.On
     }
 
     @Override
-    public void onClick(View view) {
+    public void onClick(final View view) {
         Object item = view.getTag();
-        AppCompatActivity activity = (AppCompatActivity) view.getContext();
-        Intent destIntent;
+        final AppCompatActivity activity = (AppCompatActivity) view.getContext();
         if (item instanceof BeanHorizontalCards) {
-            destIntent = new Intent(activity, ActivityCardDetail.class);
+            final Intent destIntent = new Intent(activity, ActivityCardDetail.class);
             destIntent.putExtra("uri", ((BeanHorizontalCards) item).getUri());
             destIntent.putExtra("title", ((BeanHorizontalCards) item).getTitle());
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                Window window = activity.getWindow();
-                window.setSharedElementEnterTransition(DraweeTransition.createTransitionSet(
-                        ScalingUtils.ScaleType.CENTER_CROP, ScalingUtils.ScaleType.CENTER_CROP));
-                window.setSharedElementExitTransition(DraweeTransition.createTransitionSet(
-                        ScalingUtils.ScaleType.CENTER_CROP, ScalingUtils.ScaleType.CENTER_CROP));
-//                window.setSharedElementEnterTransition(DraweeTransition.createTransitionSet(
-//                        ScalingUtils.ScaleType.CENTER_CROP, ScalingUtils.ScaleType.CENTER_CROP));
-                final View photo = view.findViewById(R.id.photo);
-                final View title = view.findViewById(R.id.title);
-                title.setVisibility(View.INVISIBLE);
-                activity.setExitSharedElementCallback(new SharedElementCallback() {
-
-                    @Override
-                    public void onSharedElementEnd(List<String> sharedElementNames,
-                                                   List<View> sharedElements,
-                                                   List<View> sharedElementSnapshots) {
-
-                        super.onSharedElementEnd(sharedElementNames, sharedElements,
-                                sharedElementSnapshots);
-
-                        for (View view : sharedElements) {
-                            if (view == photo) {
-                                view.setVisibility(View.VISIBLE);
-                                title.setVisibility(View.VISIBLE);
-                            }
+                if (view.getTop() < 0) {
+                    final CardRecyclerView recyclerView = (CardRecyclerView) view.getParent();
+                    recyclerView.smoothScrollToPosition(recyclerView.getChildAdapterPosition(view), new ScrollAnimatorObserver() {
+                        @Override
+                        public void end() {
+                            if (view != null && activity != null && destIntent != null)
+                                startActivityTransition(view, activity, destIntent);
                         }
-                    }
-                });
-                photo.setTransitionName("photo");
-                activity.startActivity(destIntent, ActivityOptions.makeSceneTransitionAnimation(activity, photo, "photo").toBundle());
+                    });
+                } else {
+                    startActivityTransition(view, activity, destIntent);
+                }
             } else {
                 activity.startActivity(destIntent);
             }
         }
+    }
+
+    @TargetApi(21)
+    private void startActivityTransition(View view, AppCompatActivity activity, Intent destIntent) {
+        Window window = activity.getWindow();
+        window.setSharedElementEnterTransition(DraweeTransition.createTransitionSet(
+                ScalingUtils.ScaleType.CENTER_CROP, ScalingUtils.ScaleType.CENTER_CROP));
+        window.setSharedElementExitTransition(DraweeTransition.createTransitionSet(
+                ScalingUtils.ScaleType.CENTER_CROP, ScalingUtils.ScaleType.CENTER_CROP));
+        final View photo = view.findViewById(R.id.photo);
+        final View title = view.findViewById(R.id.title);
+        title.setVisibility(View.INVISIBLE);
+        activity.setExitSharedElementCallback(new SharedElementCallback() {
+
+            @Override
+            public void onSharedElementEnd(List<String> sharedElementNames,
+                                           List<View> sharedElements,
+                                           List<View> sharedElementSnapshots) {
+
+                super.onSharedElementEnd(sharedElementNames, sharedElements,
+                        sharedElementSnapshots);
+
+                for (View view : sharedElements) {
+                    if (view == photo) {
+                        view.setVisibility(View.VISIBLE);
+                        title.setVisibility(View.VISIBLE);
+                    }
+                }
+            }
+        });
+        photo.setTransitionName("photo");
+        activity.startActivity(destIntent, ActivityOptions.makeSceneTransitionAnimation(activity, photo, "photo").toBundle());
     }
 }

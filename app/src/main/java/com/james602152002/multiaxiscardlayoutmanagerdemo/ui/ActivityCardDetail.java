@@ -30,20 +30,26 @@ import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 /**
  * Created by shiki60215 on 18-3-2.
  */
 
 public class ActivityCardDetail extends BaseActivity {
 
-    private SmartRefreshLayout smartRefreshLayout;
+    @BindView(R.id.recycler_view)
+    RecyclerView recyclerView;
+    @BindView(R.id.smart_refresh_layout)
+    SmartRefreshLayout smartRefreshLayout;
     private final SparseArray<BeanCardDetailListItems> data = new SparseArray<>();
-    private RecyclerView recyclerView;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_card_detail);
+        ButterKnife.bind(this);
 
         initToolBar();
         initView();
@@ -70,9 +76,8 @@ public class ActivityCardDetail extends BaseActivity {
     }
 
     private void initView() {
-        smartRefreshLayout = findViewById(R.id.smart_refresh_layout);
 //        smartRefreshLayout.setHeaderHeight(DensityUtil.px2dp(100) )
-        ((CollapsingToolBarMaterialHeader)findViewById(R.id.header)).setAppBarLayout((AppBarLayout) findViewById(R.id.appbar));
+        ((CollapsingToolBarMaterialHeader) findViewById(R.id.header)).setAppBarLayout((AppBarLayout) findViewById(R.id.appbar));
         smartRefreshLayout.setOnRefreshListener(new OnRefreshListener() {
             @Override
             public void onRefresh(@NonNull RefreshLayout refreshLayout) {
@@ -80,7 +85,6 @@ public class ActivityCardDetail extends BaseActivity {
             }
         });
         smartRefreshLayout.autoRefresh();
-        recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         recyclerView.addItemDecoration(new CardDetailDecoration());
 //        recyclerView.setItemAnimator(new CardDetailItemAnimator());

@@ -3,7 +3,6 @@ package com.james602152002.multiaxiscardlayoutmanagerdemo;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.Toolbar;
 import android.util.SparseArray;
@@ -12,7 +11,7 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.james602152002.multiaxiscardlayoutmanager.ui.CardRecyclerView;
+import com.james602152002.multiaxiscardlayoutmanager.ui.MultiAxisCardRecyclerView;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.adapter.HomepageCardAdapter;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.bean.BeanHorizontalCards;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.item_decoration.MultiAxisCardDecoration;
@@ -22,9 +21,14 @@ import com.james602152002.multiaxiscardlayoutmanagerdemo.util.DiffCallBackUtil;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+
 public class MainActivity extends BaseActivity implements View.OnClickListener {
 
-    private CardRecyclerView recyclerView;
+    @BindView(R.id.recycler_view)
+    MultiAxisCardRecyclerView recyclerView;
     private SparseArray<Object> mData = new SparseArray<>();
     private HomepageCardAdapter mAdapter;
 
@@ -32,6 +36,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
         initToolBar();
         initView();
     }
@@ -55,25 +60,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     }
 
     private void initView() {
-        recyclerView = findViewById(R.id.recycler_view);
-//        // Scroll to view and run animation when scrolling completes.
-//        recyclerView.smoothScrollToPosition(0);
-//        recyclerView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
-//
-//            @Override
-//            public boolean onPreDraw() {
-//                recyclerView.getViewTreeObserver().removeOnPreDrawListener(this);
-//                // Open activity here.
-//                return true;
-//            }
-//        });
         recyclerView.addItemDecoration(new MultiAxisCardDecoration());
         fetchData();
         mAdapter = new HomepageCardAdapter(this, mData, R.layout.card_cell, R.layout.horizontal_card);
         recyclerView.setAdapter(mAdapter);
-
-        FloatingActionButton actionButton = findViewById(R.id.action_btn);
-        actionButton.setOnClickListener(this);
     }
 
     private void fetchData() {
@@ -121,6 +111,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         }
     }
 
+    @OnClick(R.id.action_btn)
     @Override
     public void onClick(View v) {
         switch (v.getId()) {

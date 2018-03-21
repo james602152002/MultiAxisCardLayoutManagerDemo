@@ -18,7 +18,7 @@ import com.facebook.drawee.view.DraweeTransition;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.james602152002.multiaxiscardlayoutmanager.adapter.MultiAxisCardAdapter;
 import com.james602152002.multiaxiscardlayoutmanager.interfaces.ScrollAnimatorObserver;
-import com.james602152002.multiaxiscardlayoutmanager.ui.CardRecyclerView;
+import com.james602152002.multiaxiscardlayoutmanager.ui.MultiAxisCardRecyclerView;
 import com.james602152002.multiaxiscardlayoutmanager.viewholder.BaseCardViewHolder;
 import com.james602152002.multiaxiscardlayoutmanager.viewholder.HorizontalCardViewHolder;
 import com.james602152002.multiaxiscardlayoutmanager.viewholder.VerticalCardViewHolder;
@@ -27,6 +27,9 @@ import com.james602152002.multiaxiscardlayoutmanagerdemo.bean.BeanHorizontalCard
 import com.james602152002.multiaxiscardlayoutmanagerdemo.ui.ActivityCardDetail;
 
 import java.util.List;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 /**
  * Created by shiki60215 on 18-3-1.
@@ -56,13 +59,14 @@ public class HomepageCardAdapter extends MultiAxisCardAdapter implements View.On
 
     class H_PhotoCardViewHolder extends HorizontalCardViewHolder {
 
-        private SimpleDraweeView photo;
-        private AppCompatTextView title;
+        @BindView(R.id.photo)
+        SimpleDraweeView photo;
+        @BindView(R.id.title)
+        AppCompatTextView title;
 
         public H_PhotoCardViewHolder(View itemView) {
             super(itemView);
-            photo = itemView.findViewById(R.id.photo);
-            title = itemView.findViewById(R.id.title);
+            ButterKnife.bind(this,itemView);
         }
 
         @Override
@@ -101,7 +105,7 @@ public class HomepageCardAdapter extends MultiAxisCardAdapter implements View.On
             destIntent.putExtra("title", ((BeanHorizontalCards) item).getTitle());
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 if (view.getTop() < 0) {
-                    final CardRecyclerView recyclerView = (CardRecyclerView) view.getParent();
+                    final MultiAxisCardRecyclerView recyclerView = (MultiAxisCardRecyclerView) view.getParent();
                     recyclerView.smoothScrollToPosition(recyclerView.getChildAdapterPosition(view), new ScrollAnimatorObserver() {
                         @Override
                         public void end() {

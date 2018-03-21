@@ -5,7 +5,6 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
 import android.support.design.widget.AppBarLayout;
@@ -262,28 +261,6 @@ public class CollapsingToolBarMaterialHeader extends InternalAbstract implements
     }
 
     /**
-     * @param colors 对应Xml中配置的 srlPrimaryColor srlAccentColor
-     * @deprecated 请使用 {@link RefreshLayout#setPrimaryColorsId(int...)}
-     */
-    @Override
-    @Deprecated
-    public void setPrimaryColors(@ColorInt int... colors) {
-        if (colors.length > 0) {
-            mBezierPaint.setColor(colors[0]);
-        }
-    }
-
-//    @NonNull
-//    @Override
-//    public SpinnerStyle getSpinnerStyle() {
-//        return SpinnerStyle.MatchLayout;
-//    }
-    //</editor-fold>
-
-
-    //<editor-fold desc="API">
-
-    /**
      * 设置 ColorScheme
      *
      * @param colors ColorScheme
@@ -320,16 +297,4 @@ public class CollapsingToolBarMaterialHeader extends InternalAbstract implements
         return this;
     }
 
-    /**
-     * 是否显示贝塞尔图形
-     *
-     * @param show 是否显示
-     * @return MaterialHeader
-     */
-    public CollapsingToolBarMaterialHeader setShowBezierWave(boolean show) {
-        this.mShowBezierWave = show;
-        return this;
-    }
-
-    //</editor-fold>
 }

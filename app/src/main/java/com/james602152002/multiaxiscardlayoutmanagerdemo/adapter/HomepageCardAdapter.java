@@ -5,17 +5,23 @@ import android.app.ActivityOptions;
 import android.app.SharedElementCallback;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatTextView;
+import android.text.TextUtils;
 import android.util.SparseArray;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 
+import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.drawable.ScalingUtils;
+import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.view.DraweeTransition;
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.facebook.imagepipeline.request.ImageRequest;
+import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.james602152002.multiaxiscardlayoutmanager.adapter.MultiAxisCardAdapter;
 import com.james602152002.multiaxiscardlayoutmanager.interfaces.ScrollAnimatorObserver;
 import com.james602152002.multiaxiscardlayoutmanager.ui.MultiAxisCardRecyclerView;
@@ -66,14 +72,28 @@ public class HomepageCardAdapter extends MultiAxisCardAdapter implements View.On
 
         public H_PhotoCardViewHolder(View itemView) {
             super(itemView);
-            ButterKnife.bind(this,itemView);
+            ButterKnife.bind(this, itemView);
         }
 
         @Override
         public void initView(int v_card_position, int h_card_position) {
             final List<BeanHorizontalCards> h_items = (List<BeanHorizontalCards>) items.get(v_card_position);
             final BeanHorizontalCards item = h_items.get(h_card_position);
-            photo.setImageURI(item.getUri());
+            final String uriStr = item.getUri();
+
+            if (!TextUtils.isEmpty(uriStr)) {
+                Uri uri = Uri.parse(uriStr);
+                ImageRequest request = ImageRequestBuilder.newBuilderWithSource(uri)
+                        .setProgressiveRenderingEnabled(true)
+                        .build();
+                DraweeController controller = Fresco.newDraweeControllerBuilder()
+                        .setImageRequest(request)
+                        .setOldController(photo.getController())
+                        .build();
+                photo.setController(controller);
+            }
+
+//            photo.setImageURI(item.getUri());
             title.setText(item.getTitle());
             itemView.setTag(item);
             itemView.setOnClickListener(HomepageCardAdapter.this);

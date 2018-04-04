@@ -40,7 +40,6 @@ public class CardDetailAdapter extends RecyclerView.Adapter<CardDetailAdapter.Ca
     @Override
     public CardViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         CardViewHolder holder = new CardViewHolder(inflater.inflate(R.layout.cell_activity_card_detail, parent, false));
-//        Log.i("", "create view holder");
         if (show_anim) {
             final short duration = 1000;
             AnimationSet anim = new AnimationSet(true);

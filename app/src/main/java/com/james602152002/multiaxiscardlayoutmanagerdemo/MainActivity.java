@@ -75,6 +75,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 case 1:
                     List<BeanHorizontalCards> list = new ArrayList<>();
                     BeanHorizontalCards item = new BeanHorizontalCards();
+//                    progressive jpeg
+//                    http://bbshowcase.org/progressive/?r=8&progressive=959108&rate=0
                     item.setUri("http://img4.imgtn.bdimg.com/it/u=3750011819,3893667393&fm=27&gp=0.jpg");
                     item.setTitle("Nier Automata Photo 1");
                     list.add(item);

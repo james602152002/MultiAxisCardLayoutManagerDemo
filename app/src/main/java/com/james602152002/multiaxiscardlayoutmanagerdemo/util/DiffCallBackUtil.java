@@ -9,10 +9,10 @@ import android.util.SparseArray;
 
 public class DiffCallBackUtil extends DiffUtil.Callback {
 
-    private SparseArray<Object> oldData;
-    private SparseArray<Object> newData;
+    private SparseArray<? extends Object> oldData;
+    private SparseArray<? extends Object> newData;
 
-    public DiffCallBackUtil(SparseArray<Object> oldData, SparseArray<Object> newData) {
+    public DiffCallBackUtil(SparseArray<? extends Object> oldData, SparseArray<? extends Object> newData) {
         this.oldData = oldData;
         this.newData = newData;
     }

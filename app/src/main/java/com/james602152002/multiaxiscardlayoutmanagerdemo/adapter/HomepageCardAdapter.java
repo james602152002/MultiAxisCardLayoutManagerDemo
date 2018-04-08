@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatTextView;
+import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.SparseArray;
 import android.view.View;
@@ -31,6 +32,7 @@ import com.james602152002.multiaxiscardlayoutmanager.viewholder.VerticalCardView
 import com.james602152002.multiaxiscardlayoutmanagerdemo.R;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.bean.BeanHorizontalCards;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.ui.ActivityCardDetail;
+import com.james602152002.multiaxiscardlayoutmanagerdemo.util.IPhone6ScreenResizeUtil;
 
 import java.util.List;
 
@@ -73,6 +75,11 @@ public class HomepageCardAdapter extends MultiAxisCardAdapter implements View.On
         public H_PhotoCardViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+            RecyclerView.LayoutParams cardParams = (RecyclerView.LayoutParams) itemView.getLayoutParams();
+            cardParams.width = IPhone6ScreenResizeUtil.getPxValue(450);
+            cardParams.height = IPhone6ScreenResizeUtil.getPxValue(600);
+
+            IPhone6ScreenResizeUtil.adjustTextSize(title, 28);
         }
 
         @Override
@@ -102,11 +109,15 @@ public class HomepageCardAdapter extends MultiAxisCardAdapter implements View.On
 
     class V_TitleViewHolder extends VerticalCardViewHolder {
 
-        private AppCompatTextView title;
+        @BindView(R.id.title)
+        AppCompatTextView title;
+        @BindView(R.id.more)
+        AppCompatTextView more;
 
         public V_TitleViewHolder(View itemView) {
             super(itemView);
-            title = itemView.findViewById(R.id.title);
+            ButterKnife.bind(this, itemView);
+            IPhone6ScreenResizeUtil.adjustTextArrSize(32, title, more);
         }
 
         @Override

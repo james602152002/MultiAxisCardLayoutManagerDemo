@@ -11,12 +11,14 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.facebook.drawee.view.SimpleDraweeView;
 import com.james602152002.multiaxiscardlayoutmanager.ui.MultiAxisCardRecyclerView;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.adapter.HomepageCardAdapter;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.bean.BeanHorizontalCards;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.item_decoration.MultiAxisCardDecoration;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.ui.BaseActivity;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.util.DiffCallBackUtil;
+import com.james602152002.multiaxiscardlayoutmanagerdemo.util.IPhone6ScreenResizeUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +31,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     @BindView(R.id.recycler_view)
     MultiAxisCardRecyclerView recyclerView;
+    @BindView(R.id.header_img)
+    SimpleDraweeView simpleDraweeView;
     private SparseArray<Object> mData = new SparseArray<>();
     private HomepageCardAdapter mAdapter;
 
@@ -56,7 +60,11 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         text_view.setText(R.string.app_name);
         text_view.setGravity(Gravity.CENTER_VERTICAL);
         view.addView(text_view);
+        IPhone6ScreenResizeUtil.adjustTextSize(text_view, 34);
         mToolbar.addView(view);
+
+        CollapsingToolbarLayout.LayoutParams imgParams = (CollapsingToolbarLayout.LayoutParams) simpleDraweeView.getLayoutParams();
+        imgParams.height = IPhone6ScreenResizeUtil.getPxValue(300);
     }
 
     private void initView() {

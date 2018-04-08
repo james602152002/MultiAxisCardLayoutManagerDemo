@@ -20,6 +20,7 @@ import com.james602152002.multiaxiscardlayoutmanagerdemo.adapter.CardDetailAdapt
 import com.james602152002.multiaxiscardlayoutmanagerdemo.bean.BeanCardDetailListItems;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.item_decoration.CardDetailDecoration;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.util.DiffCallBackUtil;
+import com.james602152002.multiaxiscardlayoutmanagerdemo.util.IPhone6ScreenResizeUtil;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.listener.OnLoadMoreListener;
@@ -45,6 +46,8 @@ public class ActivityCardDetail extends BaseActivity {
     RecyclerView recyclerView;
     @BindView(R.id.smart_refresh_layout)
     SmartRefreshLayout smartRefreshLayout;
+    @BindView(R.id.toolbar_image)
+    SimpleDraweeView image;
     private final SparseArray<BeanCardDetailListItems> data = new SparseArray<>();
 
     @Override
@@ -71,9 +74,12 @@ public class ActivityCardDetail extends BaseActivity {
         text_view.setTextColor(Color.WHITE);
         text_view.setText(getIntent().getStringExtra("title"));
         text_view.setGravity(Gravity.CENTER_VERTICAL);
+        IPhone6ScreenResizeUtil.adjustTextSize(text_view, 34);
         view.addView(text_view);
         mToolbar.addView(view);
-        SimpleDraweeView image = findViewById(R.id.toolbar_image);
+
+        CollapsingToolbarLayout.LayoutParams imgParams = (CollapsingToolbarLayout.LayoutParams) image.getLayoutParams();
+        imgParams.height = IPhone6ScreenResizeUtil.getPxValue(400);
         image.setImageURI(getIntent().getStringExtra("uri"));
     }
 
@@ -109,10 +115,6 @@ public class ActivityCardDetail extends BaseActivity {
 
                     @Override
                     public void onNext(Long aLong) {
-                        SparseArray<BeanCardDetailListItems> oldData = new SparseArray<>();
-                        for (int i = 0; i < data.size(); i++) {
-                            oldData.put(i, data.get(i));
-                        }
                         data.clear();
                         SparseArray<BeanCardDetailListItems> items = new SparseArray<>();
                         for (int i = 0; i < 5; i++) {
@@ -126,8 +128,7 @@ public class ActivityCardDetail extends BaseActivity {
                         smartRefreshLayout.finishRefresh();
 
                         if (recyclerView.getAdapter() != null) {
-                            DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffCallBackUtil(oldData, data), true);
-                            diffResult.dispatchUpdatesTo(recyclerView.getAdapter());
+                            recyclerView.getAdapter().notifyDataSetChanged();
                         } else {
                             recyclerView.setAdapter(new CardDetailAdapter(ActivityCardDetail.this, data));
                         }

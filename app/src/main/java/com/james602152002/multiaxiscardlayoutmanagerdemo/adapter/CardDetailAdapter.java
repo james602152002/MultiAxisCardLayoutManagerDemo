@@ -2,6 +2,8 @@ package com.james602152002.multiaxiscardlayoutmanagerdemo.adapter;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.constraint.ConstraintLayout;
+import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.RecyclerView;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
@@ -14,6 +16,10 @@ import android.view.animation.TranslateAnimation;
 
 import com.james602152002.multiaxiscardlayoutmanagerdemo.R;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.bean.BeanCardDetailListItems;
+import com.james602152002.multiaxiscardlayoutmanagerdemo.util.IPhone6ScreenResizeUtil;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 /**
  * Created by shiki60215 on 18-3-7.
@@ -82,12 +88,34 @@ public class CardDetailAdapter extends RecyclerView.Adapter<CardDetailAdapter.Ca
     }
 
     class CardViewHolder extends RecyclerView.ViewHolder {
+
+        @BindView(R.id.vertical_divider)
+        View v_divider;
+        @BindView(R.id.title)
+        AppCompatTextView title;
+        @BindView(R.id.content)
+        AppCompatTextView content;
+
         public CardViewHolder(View itemView) {
             super(itemView);
+            ButterKnife.bind(this, itemView);
+            ((ConstraintLayout.LayoutParams) v_divider.getLayoutParams()).width = IPhone6ScreenResizeUtil.getPxValue(20);
+
+            final int h_margin = IPhone6ScreenResizeUtil.getPxValue(20);
+            final int v_margin = IPhone6ScreenResizeUtil.getPxValue(30);
+            ConstraintLayout.LayoutParams titleParams = (ConstraintLayout.LayoutParams) title.getLayoutParams();
+            titleParams.setMargins(h_margin, v_margin, h_margin, v_margin >> 1);
+
+            ConstraintLayout.LayoutParams contentParams = (ConstraintLayout.LayoutParams) content.getLayoutParams();
+            contentParams.setMargins(h_margin, v_margin >> 1, h_margin, v_margin);
+
+            IPhone6ScreenResizeUtil.adjustTextSize(title, 32);
+            IPhone6ScreenResizeUtil.adjustTextSize(content, 24);
         }
 
         public void initView(int position) {
             final BeanCardDetailListItems item = items.get(position);
+            title.setText(item.getTitle());
         }
     }
 }

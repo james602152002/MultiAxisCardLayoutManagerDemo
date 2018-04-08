@@ -64,7 +64,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         mToolbar.addView(view);
 
         CollapsingToolbarLayout.LayoutParams imgParams = (CollapsingToolbarLayout.LayoutParams) simpleDraweeView.getLayoutParams();
-        imgParams.height = IPhone6ScreenResizeUtil.getPxValue(300);
+        imgParams.height = IPhone6ScreenResizeUtil.getPxValue(400);
     }
 
     private void initView() {

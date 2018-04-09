@@ -1,4 +1,4 @@
-package com.james602152002.multiaxiscardlayoutmanagerdemo.item_decoration;
+package com.james602152002.multiaxiscardlayoutmanagerdemo.recyclerview.item_decoration;
 
 import android.graphics.Rect;
 import android.support.v7.widget.RecyclerView;

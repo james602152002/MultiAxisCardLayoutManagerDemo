@@ -5,7 +5,6 @@ import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.RecyclerView;
-import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,7 +16,11 @@ import android.widget.TextView;
 
 import com.james602152002.multiaxiscardlayoutmanagerdemo.R;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.bean.BeanCardDetailListItems;
+import com.james602152002.multiaxiscardlayoutmanagerdemo.recyclerview.item_touch_helper.ItemMoveAdapter;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.util.IPhone6ScreenResizeUtil;
+
+import java.util.Collections;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -26,13 +29,13 @@ import butterknife.ButterKnife;
  * Created by shiki60215 on 18-3-7.
  */
 
-public class CardDetailAdapter extends RecyclerView.Adapter<CardDetailAdapter.CardViewHolder> {
+public class CardDetailAdapter extends RecyclerView.Adapter<CardDetailAdapter.CardViewHolder> implements ItemMoveAdapter {
 
     private final LayoutInflater inflater;
-    private SparseArray<BeanCardDetailListItems> items;
+    private List<BeanCardDetailListItems> items;
     private boolean show_anim = true;
 
-    public CardDetailAdapter(Context context, SparseArray<BeanCardDetailListItems> data) {
+    public CardDetailAdapter(Context context, List<BeanCardDetailListItems> data) {
         inflater = LayoutInflater.from(context);
         this.items = data;
     }
@@ -119,4 +122,12 @@ public class CardDetailAdapter extends RecyclerView.Adapter<CardDetailAdapter.Ca
             title.setText(item.getTitle());
         }
     }
+
+    @Override
+    public void move(int fromPos, int toPos) {
+        Collections.swap(items, fromPos, toPos);
+        notifyItemMoved(fromPos, toPos);
+    }
+
+
 }

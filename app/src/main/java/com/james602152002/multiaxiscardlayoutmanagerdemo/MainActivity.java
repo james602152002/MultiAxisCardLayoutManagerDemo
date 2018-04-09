@@ -15,7 +15,7 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import com.james602152002.multiaxiscardlayoutmanager.ui.MultiAxisCardRecyclerView;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.adapter.HomepageCardAdapter;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.bean.BeanHorizontalCards;
-import com.james602152002.multiaxiscardlayoutmanagerdemo.item_decoration.MultiAxisCardDecoration;
+import com.james602152002.multiaxiscardlayoutmanagerdemo.recyclerview.item_decoration.MultiAxisCardDecoration;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.ui.BaseActivity;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.util.DiffCallBackUtil;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.util.IPhone6ScreenResizeUtil;

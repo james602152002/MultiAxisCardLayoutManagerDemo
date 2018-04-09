@@ -9,7 +9,7 @@ import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.SparseArray;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Gravity;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -18,14 +18,18 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.R;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.adapter.CardDetailAdapter;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.bean.BeanCardDetailListItems;
-import com.james602152002.multiaxiscardlayoutmanagerdemo.item_decoration.CardDetailDecoration;
-import com.james602152002.multiaxiscardlayoutmanagerdemo.util.DiffCallBackUtil;
+import com.james602152002.multiaxiscardlayoutmanagerdemo.recyclerview.item_decoration.CardDetailDecoration;
+import com.james602152002.multiaxiscardlayoutmanagerdemo.recyclerview.item_touch_helper.CardDetailItemTouchHelperCallBack;
+import com.james602152002.multiaxiscardlayoutmanagerdemo.recyclerview.item_touch_helper.ItemMoveAdapter;
+import com.james602152002.multiaxiscardlayoutmanagerdemo.util.DiffListCallBackUtil;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.util.IPhone6ScreenResizeUtil;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.listener.OnLoadMoreListener;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
@@ -48,7 +52,7 @@ public class ActivityCardDetail extends BaseActivity {
     SmartRefreshLayout smartRefreshLayout;
     @BindView(R.id.toolbar_image)
     SimpleDraweeView image;
-    private final SparseArray<BeanCardDetailListItems> data = new SparseArray<>();
+    private final List<BeanCardDetailListItems> data = new ArrayList<>();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -116,21 +120,22 @@ public class ActivityCardDetail extends BaseActivity {
                     @Override
                     public void onNext(Long aLong) {
                         data.clear();
-                        SparseArray<BeanCardDetailListItems> items = new SparseArray<>();
+                        List<BeanCardDetailListItems> items = new ArrayList<>();
                         for (int i = 0; i < 5; i++) {
                             BeanCardDetailListItems item = new BeanCardDetailListItems();
                             item.setTitle(new StringBuilder("Card Detail Title ").append(i + 1).toString());
-                            items.put(i, item);
+                            items.add(i, item);
                         }
-                        for (int i = 0; i < items.size(); i++) {
-                            data.put(data.size(), items.get(i));
-                        }
+                        data.addAll(items);
                         smartRefreshLayout.finishRefresh();
 
                         if (recyclerView.getAdapter() != null) {
                             recyclerView.getAdapter().notifyDataSetChanged();
                         } else {
                             recyclerView.setAdapter(new CardDetailAdapter(ActivityCardDetail.this, data));
+                            CardDetailItemTouchHelperCallBack callBack = new CardDetailItemTouchHelperCallBack((ItemMoveAdapter) recyclerView.getAdapter());
+                            ItemTouchHelper touchHelper = new ItemTouchHelper(callBack);
+                            touchHelper.attachToRecyclerView(recyclerView);
                         }
                         disposable.dispose();
                         disposable.clear();
@@ -160,21 +165,17 @@ public class ActivityCardDetail extends BaseActivity {
 
                     @Override
                     public void onNext(Long aLong) {
-                        SparseArray<BeanCardDetailListItems> oldData = new SparseArray<>();
-                        for (int i = 0; i < data.size(); i++) {
-                            oldData.put(i, data.get(i));
-                        }
-                        SparseArray<BeanCardDetailListItems> items = new SparseArray<>();
+                        List<BeanCardDetailListItems> oldData = new ArrayList<>();
+                        oldData.addAll(data);
+                        List<BeanCardDetailListItems> items = new ArrayList<>();
                         for (int i = 0; i < 5; i++) {
                             BeanCardDetailListItems item = new BeanCardDetailListItems();
                             item.setTitle(new StringBuilder("Card Detail Title ").append(data.size() + i + 1).toString());
-                            items.put(i, item);
+                            items.add(i, item);
                         }
-                        for (int i = 0; i < items.size(); i++) {
-                            data.put(data.size(), items.get(i));
-                        }
+                        data.addAll(items);
                         smartRefreshLayout.finishLoadMore();
-                        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffCallBackUtil(oldData, data), true);
+                        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffListCallBackUtil(oldData, data), true);
                         diffResult.dispatchUpdatesTo(recyclerView.getAdapter());
                         disposable.dispose();
                         disposable.clear();

@@ -40,7 +40,7 @@ dependencies {
     //retrofit framework
     implementation 'com.facebook.fresco:fresco:1.8.1'
     implementation 'com.kelin.translucentbar:library:0.8.0'
-    implementation 'com.github.james602152002:MultiAxisCardRecyclerView:1.0.4'
+    implementation 'com.github.james602152002:MultiAxisCardRecyclerView:1.0.5'
     implementation 'com.scwang.smartrefresh:SmartRefreshLayout:1.1.0-alpha-1'
     implementation 'com.scwang.smartrefresh:SmartRefreshHeader:1.1.0-alpha-1'
     //butterknife

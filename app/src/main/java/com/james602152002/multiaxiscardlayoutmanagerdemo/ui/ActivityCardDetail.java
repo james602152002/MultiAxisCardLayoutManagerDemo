@@ -167,7 +167,7 @@ public class ActivityCardDetail extends BaseActivity {
                         SparseArray<BeanCardDetailListItems> items = new SparseArray<>();
                         for (int i = 0; i < 5; i++) {
                             BeanCardDetailListItems item = new BeanCardDetailListItems();
-                            item.setTitle(new StringBuilder("Card Detail Title ").append(i + 1).toString());
+                            item.setTitle(new StringBuilder("Card Detail Title ").append(data.size() + i + 1).toString());
                             items.put(i, item);
                         }
                         for (int i = 0; i < items.size(); i++) {

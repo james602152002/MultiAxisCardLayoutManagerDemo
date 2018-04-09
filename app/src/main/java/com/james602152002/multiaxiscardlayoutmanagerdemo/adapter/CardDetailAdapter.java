@@ -13,6 +13,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
 import android.view.animation.RotateAnimation;
 import android.view.animation.TranslateAnimation;
+import android.widget.TextView;
 
 import com.james602152002.multiaxiscardlayoutmanagerdemo.R;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.bean.BeanCardDetailListItems;
@@ -94,7 +95,7 @@ public class CardDetailAdapter extends RecyclerView.Adapter<CardDetailAdapter.Ca
         @BindView(R.id.title)
         AppCompatTextView title;
         @BindView(R.id.content)
-        AppCompatTextView content;
+        TextView content;
 
         public CardViewHolder(View itemView) {
             super(itemView);

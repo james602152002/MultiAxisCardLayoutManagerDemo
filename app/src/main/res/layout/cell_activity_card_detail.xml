@@ -31,12 +31,13 @@
             app:layout_constraintStart_toEndOf="@id/vertical_divider"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <android.support.v7.widget.AppCompatTextView
+        <me.codeboy.android.aligntextview.CBAlignTextView
             android:id="@+id/content"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:includeFontPadding="false"
-            android:text="content_content_content_content_content_content_content_content_content_content_content_content_content_content_content_content_content_content_content_content_content"
+            android:textIsSelectable="true"
+            android:text="contentcontentcontentcontentcontentcontentcontentcontentcontentcontentcontentcontentcontentcontentcontentcontentcontentcontentcontentcontentcontent."
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintStart_toEndOf="@id/vertical_divider"

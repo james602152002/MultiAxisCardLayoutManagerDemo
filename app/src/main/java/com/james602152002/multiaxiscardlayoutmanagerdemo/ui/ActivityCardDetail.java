@@ -88,8 +88,6 @@ public class ActivityCardDetail extends BaseActivity {
     }
 
     private void initView() {
-//        smartRefreshLayout.setHeaderHeight(DensityUtil.px2dp(100) )
-//        ((CollapsingToolBarMaterialHeader) findViewById(R.id.header)).setAppBarLayout((AppBarLayout) findViewById(R.id.appbar));
         smartRefreshLayout.setOnRefreshListener(new OnRefreshListener() {
             @Override
             public void onRefresh(@NonNull RefreshLayout refreshLayout) {

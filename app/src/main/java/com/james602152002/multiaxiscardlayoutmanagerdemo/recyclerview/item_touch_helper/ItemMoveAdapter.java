@@ -2,4 +2,5 @@ package com.james602152002.multiaxiscardlayoutmanagerdemo.recyclerview.item_touc
 
 public interface ItemMoveAdapter {
     void move(int fromPos, int toPos);
+    void swipe(int pos);
 }

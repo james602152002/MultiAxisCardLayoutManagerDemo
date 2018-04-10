@@ -16,9 +16,11 @@
         <View
             android:id="@+id/vertical_divider"
             android:layout_width="20dp"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
             android:background="@color/colorPrimary"
-            app:layout_constraintLeft_toLeftOf="parent" />
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <android.support.v7.widget.AppCompatTextView
             android:id="@+id/title"
@@ -26,22 +28,41 @@
             android:layout_height="wrap_content"
             android:includeFontPadding="false"
             android:singleLine="true"
-            app:layout_constraintBottom_toTopOf="@+id/content"
+            app:layout_constraintBottom_toTopOf="@+id/photo_card"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/vertical_divider"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/photo_card"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:cardCornerRadius="0px"
+            app:cardElevation="10dp"
+            app:layout_constraintBottom_toTopOf="@+id/content"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/vertical_divider"
+            app:layout_constraintTop_toBottomOf="@id/title">
+
+            <com.facebook.drawee.view.SimpleDraweeView
+                android:id="@+id/photo"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </android.support.v7.widget.CardView>
+
 
         <me.codeboy.android.aligntextview.CBAlignTextView
             android:id="@+id/content"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:includeFontPadding="false"
-            android:textIsSelectable="true"
             android:text="contentcontentcontentcontentcontentcontentcontentcontentcontentcontentcontentcontentcontentcontentcontentcontentcontentcontentcontentcontentcontent."
+            android:textIsSelectable="true"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintStart_toEndOf="@id/vertical_divider"
-            app:layout_constraintTop_toBottomOf="@id/title" />
+            app:layout_constraintTop_toBottomOf="@id/photo_card" />
 
     </android.support.constraint.ConstraintLayout>
 

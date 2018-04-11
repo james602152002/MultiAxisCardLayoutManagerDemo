@@ -2,6 +2,7 @@ package com.james602152002.multiaxiscardlayoutmanagerdemo.adapter;
 
 import android.content.Context;
 import android.net.Uri;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.AppCompatTextView;
@@ -44,7 +45,7 @@ public class CardDetailAdapter extends RecyclerView.Adapter<CardDetailAdapter.Ca
 
     private final LayoutInflater inflater;
     private List<BeanCardDetailListItems> items;
-    private boolean show_anim = true;
+    private boolean show_anim = Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
 
     public CardDetailAdapter(Context context, List<BeanCardDetailListItems> data) {
         inflater = LayoutInflater.from(context);
@@ -151,9 +152,12 @@ public class CardDetailAdapter extends RecyclerView.Adapter<CardDetailAdapter.Ca
                 photo.setController(controller);
             }
             Document doc = Jsoup.parse("");
+            final float text_size = IPhone6ScreenResizeUtil.getPT_TextSize(10);
+            final float height = text_size * 3 + 1;
             doc.head().appendElement("style").attr("type", "text/css")
-                    .append(String.format("body{ font-size:%spx}", IPhone6ScreenResizeUtil.getPT_TextSize(10)));
-            doc.body().attr("style", "text-align:justify").append(item.getContent());
+                    .append(String.format("p{ font-size:%spx; text-overflow: ellipsis; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;}",
+                            text_size));
+            doc.body().appendElement("p").attr("style", "text-align:justify").append(item.getContent());
             content.loadData(doc.outerHtml(), "text/html; charset=utf-8", "utf-8");
         }
     }

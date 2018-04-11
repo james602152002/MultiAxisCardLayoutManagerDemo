@@ -122,6 +122,24 @@ public class ActivityCardDetail extends BaseActivity {
                         for (int i = 0; i < 5; i++) {
                             BeanCardDetailListItems item = new BeanCardDetailListItems();
                             item.setTitle(new StringBuilder("Card Detail Title ").append(i + 1).toString());
+                            switch (i) {
+                                case 0:
+                                    item.setUrl("https://i.pinimg.com/564x/d0/5c/8b/d05c8bb3bbfc36e44d4223d773157be7.jpg");
+                                    break;
+                                case 1:
+                                    item.setUrl("https://i.pinimg.com/564x/8b/a6/a2/8ba6a264e3612a2f7d00c4996aa46bb6.jpg");
+                                    break;
+                                case 2:
+                                    item.setUrl("https://i.pinimg.com/564x/66/40/58/664058b9f5a97fa84a6f94c81171b29f.jpg");
+                                    break;
+                                case 3:
+                                    item.setUrl("https://i.pinimg.com/564x/64/f2/df/64f2df00b130815eafd72c84e3839fde.jpg");
+                                    break;
+                                case 4:
+                                    item.setUrl("https://i.pinimg.com/236x/0a/f7/08/0af708327f39a7a507bebdd49c66bafb.jpg");
+                                    break;
+                            }
+                            item.setContent("相信看到这大家都明白了原理了。但是它怎么查询呢？答案是二分查找。当插入时，根据key的hashcode()方法得到hash值，计算出在mArrays的index位置，然后利用二分查找找到对应的位置进行插入，当出现哈希冲突时，会在index的相邻位置插入。");
                             items.add(i, item);
                         }
                         data.addAll(items);
@@ -169,6 +187,24 @@ public class ActivityCardDetail extends BaseActivity {
                         for (int i = 0; i < 5; i++) {
                             BeanCardDetailListItems item = new BeanCardDetailListItems();
                             item.setTitle(new StringBuilder("Card Detail Title ").append(data.size() + i + 1).toString());
+                            switch (i) {
+                                case 0:
+                                    item.setUrl("https://i.pinimg.com/564x/d0/5c/8b/d05c8bb3bbfc36e44d4223d773157be7.jpg");
+                                    break;
+                                case 1:
+                                    item.setUrl("https://i.pinimg.com/564x/8b/a6/a2/8ba6a264e3612a2f7d00c4996aa46bb6.jpg");
+                                    break;
+                                case 2:
+                                    item.setUrl("https://i.pinimg.com/564x/66/40/58/664058b9f5a97fa84a6f94c81171b29f.jpg");
+                                    break;
+                                case 3:
+                                    item.setUrl("https://i.pinimg.com/564x/64/f2/df/64f2df00b130815eafd72c84e3839fde.jpg");
+                                    break;
+                                case 4:
+                                    item.setUrl("https://i.pinimg.com/236x/0a/f7/08/0af708327f39a7a507bebdd49c66bafb.jpg");
+                                    break;
+                            }
+                            item.setContent("Since PercentRelativeLayout was deprecated in 26.0.0 and nested layouts like LinearLayout inside RelativeLayout have a negative impact on performance (Understanding the performance benefits of ConstraintLayout) the best option for you to achieve percentage width is to replace your RelativeLayout with ConstraintLayout.");
                             items.add(i, item);
                         }
                         data.addAll(items);

@@ -15,7 +15,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
 import android.view.animation.RotateAnimation;
 import android.view.animation.TranslateAnimation;
-import android.widget.TextView;
+import android.webkit.WebView;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.interfaces.DraweeController;
@@ -26,6 +26,9 @@ import com.james602152002.multiaxiscardlayoutmanagerdemo.R;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.bean.BeanCardDetailListItems;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.recyclerview.item_touch_helper.ItemMoveAdapter;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.util.IPhone6ScreenResizeUtil;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 
 import java.util.Collections;
 import java.util.List;
@@ -106,7 +109,7 @@ public class CardDetailAdapter extends RecyclerView.Adapter<CardDetailAdapter.Ca
         @BindView(R.id.title)
         AppCompatTextView title;
         @BindView(R.id.content)
-        TextView content;
+        WebView content;
         @BindView(R.id.photo_card)
         CardView photoCard;
         @BindView(R.id.photo)
@@ -115,7 +118,7 @@ public class CardDetailAdapter extends RecyclerView.Adapter<CardDetailAdapter.Ca
         public CardViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
-            ((ConstraintLayout.LayoutParams) v_divider.getLayoutParams()).width = IPhone6ScreenResizeUtil.getPxValue(30);
+            ((ConstraintLayout.LayoutParams) v_divider.getLayoutParams()).width = IPhone6ScreenResizeUtil.getPxValue(50);
 
             final int h_margin = IPhone6ScreenResizeUtil.getPxValue(40);
             final int v_margin = IPhone6ScreenResizeUtil.getPxValue(30);
@@ -129,14 +132,13 @@ public class CardDetailAdapter extends RecyclerView.Adapter<CardDetailAdapter.Ca
             photoParams.setMargins(h_margin, v_margin >> 1, h_margin, v_margin >> 1);
 
             IPhone6ScreenResizeUtil.adjustTextSize(title, 32);
-            IPhone6ScreenResizeUtil.adjustTextSize(content, 24);
         }
 
         public void initView(int position) {
             final BeanCardDetailListItems item = items.get(position);
             title.setText(item.getTitle());
 
-            String uriStr = "https://i.pinimg.com/564x/d0/5c/8b/d05c8bb3bbfc36e44d4223d773157be7.jpg";
+            final String uriStr = item.getUrl();
             if (!TextUtils.isEmpty(uriStr)) {
                 Uri uri = Uri.parse(uriStr);
                 ImageRequest request = ImageRequestBuilder.newBuilderWithSource(uri)
@@ -148,6 +150,11 @@ public class CardDetailAdapter extends RecyclerView.Adapter<CardDetailAdapter.Ca
                         .build();
                 photo.setController(controller);
             }
+            Document doc = Jsoup.parse("");
+            doc.head().appendElement("style").attr("type", "text/css")
+                    .append(String.format("body{ font-size:%spx}", IPhone6ScreenResizeUtil.getPT_TextSize(10)));
+            doc.body().attr("style", "text-align:justify").append(item.getContent());
+            content.loadData(doc.outerHtml(), "text/html; charset=utf-8", "utf-8");
         }
     }
 

@@ -52,13 +52,10 @@
         </android.support.v7.widget.CardView>
 
 
-        <me.codeboy.android.aligntextview.CBAlignTextView
+        <WebView
             android:id="@+id/content"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:includeFontPadding="false"
-            android:text="contentcontentcontentcontentcontentcontentcontentcontentcontentcontentcontentcontentcontentcontentcontentcontentcontentcontentcontentcontentcontent."
-            android:textIsSelectable="true"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintStart_toEndOf="@id/vertical_divider"

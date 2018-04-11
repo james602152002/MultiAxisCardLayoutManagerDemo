@@ -110,6 +110,10 @@ public class IPhone6ScreenResizeUtil {
         return iPhone24PTSize;
     }
 
+    public static float getPT_TextSize(float pt) {
+        return pt * text_adjust_ratio * ratioPxPt;
+    }
+
 
     /**
      * @字体大小默认28PT

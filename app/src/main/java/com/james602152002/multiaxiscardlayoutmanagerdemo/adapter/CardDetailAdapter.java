@@ -12,7 +12,6 @@ import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -184,7 +183,6 @@ public class CardDetailAdapter extends RecyclerView.Adapter<CardDetailAdapter.Ca
 
     @Override
     public void onClick(final View v) {
-        Log.i("","");
         ImageRequest imageRequest = (ImageRequest) v.getTag();
         CacheKey cacheKey = DefaultCacheKeyFactory.getInstance()
                 .getEncodedCacheKey(imageRequest, null);
@@ -195,9 +193,12 @@ public class CardDetailAdapter extends RecyclerView.Adapter<CardDetailAdapter.Ca
             @Override
             public void onAction(List<String> permissions) {
                 Uri destinationUri = Uri.fromFile(new File(Environment.getExternalStorageDirectory(), "SampleCropImage.jpeg"));
+//                UCrop.Options options = new UCrop.Options();
+//                options.setCompressionFormat(Bitmap.CompressFormat.PNG);
                 UCrop.of(Uri.fromFile(file), destinationUri)
-                        .withAspectRatio(1, 1)
-                        .withMaxResultSize(200, 200)
+//                        .withAspectRatio(1, 1)
+//                        .withMaxResultSize(200, 200)
+//                        .withOptions(options)
                         .start((Activity) context);
             }
         }).start();

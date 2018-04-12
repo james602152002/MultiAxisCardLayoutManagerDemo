@@ -1,8 +1,11 @@
 package com.james602152002.multiaxiscardlayoutmanagerdemo.adapter;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.AppCompatTextView;
@@ -18,19 +21,26 @@ import android.view.animation.RotateAnimation;
 import android.view.animation.TranslateAnimation;
 import android.webkit.WebView;
 
+import com.facebook.binaryresource.BinaryResource;
+import com.facebook.binaryresource.FileBinaryResource;
+import com.facebook.cache.common.CacheKey;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.facebook.imagepipeline.cache.DefaultCacheKeyFactory;
+import com.facebook.imagepipeline.core.ImagePipelineFactory;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.R;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.bean.BeanCardDetailListItems;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.recyclerview.item_touch_helper.ItemMoveAdapter;
+import com.james602152002.multiaxiscardlayoutmanagerdemo.util.DOMUtil;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.util.IPhone6ScreenResizeUtil;
+import com.yalantis.ucrop.UCrop;
+import com.yanzhenjie.permission.Action;
+import com.yanzhenjie.permission.AndPermission;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-
+import java.io.File;
 import java.util.Collections;
 import java.util.List;
 
@@ -41,13 +51,15 @@ import butterknife.ButterKnife;
  * Created by shiki60215 on 18-3-7.
  */
 
-public class CardDetailAdapter extends RecyclerView.Adapter<CardDetailAdapter.CardViewHolder> implements ItemMoveAdapter {
+public class CardDetailAdapter extends RecyclerView.Adapter<CardDetailAdapter.CardViewHolder> implements ItemMoveAdapter, View.OnClickListener {
 
+    private final Context context;
     private final LayoutInflater inflater;
     private List<BeanCardDetailListItems> items;
     private boolean show_anim = Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
 
     public CardDetailAdapter(Context context, List<BeanCardDetailListItems> data) {
+        this.context = context;
         inflater = LayoutInflater.from(context);
         this.items = data;
     }
@@ -142,23 +154,18 @@ public class CardDetailAdapter extends RecyclerView.Adapter<CardDetailAdapter.Ca
             final String uriStr = item.getUrl();
             if (!TextUtils.isEmpty(uriStr)) {
                 Uri uri = Uri.parse(uriStr);
-                ImageRequest request = ImageRequestBuilder.newBuilderWithSource(uri)
+                final ImageRequest request = ImageRequestBuilder.newBuilderWithSource(uri)
                         .setProgressiveRenderingEnabled(true)
                         .build();
-                DraweeController controller = Fresco.newDraweeControllerBuilder()
+                final DraweeController controller = Fresco.newDraweeControllerBuilder()
                         .setImageRequest(request)
                         .setOldController(photo.getController())
                         .build();
                 photo.setController(controller);
+                photo.setTag(request);
             }
-            Document doc = Jsoup.parse("");
-            final float text_size = IPhone6ScreenResizeUtil.getPT_TextSize(10);
-            final float height = text_size * 3 + 1;
-            doc.head().appendElement("style").attr("type", "text/css")
-                    .append(String.format("p{ font-size:%spx; text-overflow: ellipsis; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;}",
-                            text_size));
-            doc.body().appendElement("p").attr("style", "text-align:justify").append(item.getContent());
-            content.loadData(doc.outerHtml(), "text/html; charset=utf-8", "utf-8");
+            content.loadData(DOMUtil.fetchJustifyTextDOM(item.getContent(), IPhone6ScreenResizeUtil.getPT_TextSize(10), 2), "text/html; charset=utf-8", "utf-8");
+            photo.setOnClickListener(CardDetailAdapter.this);
         }
     }
 
@@ -172,5 +179,25 @@ public class CardDetailAdapter extends RecyclerView.Adapter<CardDetailAdapter.Ca
     public void swipe(int pos) {
         items.remove(pos);
         notifyItemRemoved(pos);
+    }
+
+    @Override
+    public void onClick(final View v) {
+        ImageRequest imageRequest = (ImageRequest) v.getTag();
+        CacheKey cacheKey = DefaultCacheKeyFactory.getInstance()
+                .getEncodedCacheKey(imageRequest, null);
+        BinaryResource resource = ImagePipelineFactory.getInstance().getMainFileCache()
+                .getResource(cacheKey);
+        final File file = ((FileBinaryResource) resource).getFile();
+        AndPermission.with(context).permission(Manifest.permission.WRITE_EXTERNAL_STORAGE).onGranted(new Action() {
+            @Override
+            public void onAction(List<String> permissions) {
+                Uri destinationUri = Uri.fromFile(new File(Environment.getExternalStorageDirectory(), "SampleCropImage.jpeg"));
+                UCrop.of(Uri.fromFile(file), destinationUri)
+                        .withAspectRatio(1, 1)
+                        .withMaxResultSize(200, 200)
+                        .start((Activity) context);
+            }
+        }).start();
     }
 }

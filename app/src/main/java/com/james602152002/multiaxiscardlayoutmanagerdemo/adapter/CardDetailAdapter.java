@@ -192,13 +192,16 @@ public class CardDetailAdapter extends RecyclerView.Adapter<CardDetailAdapter.Ca
         AndPermission.with(context).permission(Manifest.permission.WRITE_EXTERNAL_STORAGE).onGranted(new Action() {
             @Override
             public void onAction(List<String> permissions) {
-                Uri destinationUri = Uri.fromFile(new File(Environment.getExternalStorageDirectory(), "SampleCropImage.jpeg"));
-//                UCrop.Options options = new UCrop.Options();
-//                options.setCompressionFormat(Bitmap.CompressFormat.PNG);
+                File storageFolder = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/crop");
+                try {
+                    if (!storageFolder.exists())
+                        storageFolder.mkdir();
+                } catch (Exception e) {
+
+                }
+
+                Uri destinationUri = Uri.fromFile(new File(storageFolder, new StringBuilder().append(System.currentTimeMillis()).append(".jpeg").toString()));
                 UCrop.of(Uri.fromFile(file), destinationUri)
-//                        .withAspectRatio(1, 1)
-//                        .withMaxResultSize(200, 200)
-//                        .withOptions(options)
                         .start((Activity) context);
             }
         }).start();

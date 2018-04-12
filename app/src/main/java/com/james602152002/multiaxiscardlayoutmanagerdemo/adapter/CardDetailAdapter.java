@@ -12,6 +12,7 @@ import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -183,6 +184,7 @@ public class CardDetailAdapter extends RecyclerView.Adapter<CardDetailAdapter.Ca
 
     @Override
     public void onClick(final View v) {
+        Log.i("","");
         ImageRequest imageRequest = (ImageRequest) v.getTag();
         CacheKey cacheKey = DefaultCacheKeyFactory.getInstance()
                 .getEncodedCacheKey(imageRequest, null);

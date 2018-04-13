@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.RecyclerView;
@@ -39,6 +40,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 /**
  * Created by shiki60215 on 18-3-1.
@@ -135,7 +137,7 @@ public class HomepageCardAdapter extends MultiAxisCardAdapter {
         }
     }
 
-    class V_TitleViewHolder extends VerticalCardViewHolder implements View.OnClickListener {
+    class V_TitleViewHolder extends VerticalCardViewHolder {
 
         @BindView(R.id.title)
         AppCompatTextView title;
@@ -151,14 +153,13 @@ public class HomepageCardAdapter extends MultiAxisCardAdapter {
         @Override
         public void initView(int v_card_position, int h_card_position) {
             title.setText((String) items.get(v_card_position));
-            more.setOnClickListener(this);
         }
 
-        @Override
+        @OnClick(R.id.more)
         public void onClick(View v) {
-            final AppCompatActivity activity = (AppCompatActivity) v.getContext();
-            Intent destIntent = new Intent(activity, SVGActivity.class);
-            activity.startActivity(destIntent);
+            final Context activity = v.getContext();
+            final Intent destIntent = new Intent(activity, SVGActivity.class);
+            ActivityCompat.startActivity(activity, destIntent, null);
         }
     }
 

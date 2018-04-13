@@ -11,7 +11,7 @@
         <item name="android:launchMode">singleTask</item>
     </style>
 
-    <style name="ToolBarTheme" parent="Theme.AppCompat.DayNight">
+    <style name="ToolBarTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>

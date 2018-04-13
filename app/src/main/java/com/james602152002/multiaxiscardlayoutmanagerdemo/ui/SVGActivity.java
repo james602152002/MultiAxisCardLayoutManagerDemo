@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
+import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -15,13 +16,18 @@ import com.jaredrummler.android.widget.AnimatedSvgView;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
-public class SVGActivity extends AppCompatActivity {
+public class SVGActivity extends AppCompatActivity implements View.OnClickListener {
 
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
-    @BindView(R.id.animated_svg_view)
-    AnimatedSvgView svgView;
+    @BindView(R.id.google_animated_svg_view)
+    AnimatedSvgView googleSvgView;
+    @BindView(R.id.ailinklaw_animated_svg_view)
+    AnimatedSvgView ailinklawSvgView;
+    @BindView(R.id.logo_animated_svg_view)
+    AnimatedSvgView logoSvgView;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -29,7 +35,6 @@ public class SVGActivity extends AppCompatActivity {
         setContentView(R.layout.activity_svg);
         ButterKnife.bind(this);
         initToolBar();
-        initView();
     }
 
     private void initToolBar() {
@@ -45,8 +50,19 @@ public class SVGActivity extends AppCompatActivity {
         mToolbar.addView(view);
     }
 
-    private void initView() {
-        svgView.start();
+    @Override
+    @OnClick({R.id.google_animated_svg_view, R.id.ailinklaw_animated_svg_view, R.id.logo_animated_svg_view})
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.google_animated_svg_view:
+                googleSvgView.start();
+                break;
+            case R.id.ailinklaw_animated_svg_view:
+                ailinklawSvgView.start();
+                break;
+            case R.id.logo_animated_svg_view:
+                logoSvgView.start();
+                break;
+        }
     }
-
 }

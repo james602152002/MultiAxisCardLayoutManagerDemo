@@ -19,4 +19,14 @@
         <item>@color/google_blue</item>
         <item>@color/google_green</item>
     </integer-array>
+
+    <integer-array name="ailinklaw_glyph_colors">
+        <item>@color/google_red</item>
+    </integer-array>
+
+    <integer-array name="logo_glyph_colors">
+        <item>@color/colorPrimaryDark</item>
+        <item>@color/google_red</item>
+        <item>@color/colorPrimaryDark</item>
+    </integer-array>
 </resources>

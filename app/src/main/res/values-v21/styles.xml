@@ -14,4 +14,9 @@
         <item name="android:screenOrientation">portrait</item>
     </style>
 
+    <style name="ToolBarTheme" parent = "AppTheme">
+        <item name="android:windowTranslucentStatus">false</item>
+        <item name="android:statusBarColor">@color/colorAccent</item>
+    </style>
+
 </resources>

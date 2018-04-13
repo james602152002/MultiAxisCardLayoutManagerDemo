@@ -32,6 +32,7 @@ import com.james602152002.multiaxiscardlayoutmanager.viewholder.VerticalCardView
 import com.james602152002.multiaxiscardlayoutmanagerdemo.R;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.bean.BeanHorizontalCards;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.ui.ActivityCardDetail;
+import com.james602152002.multiaxiscardlayoutmanagerdemo.ui.SVGActivity;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.util.IPhone6ScreenResizeUtil;
 
 import java.util.List;
@@ -43,7 +44,7 @@ import butterknife.ButterKnife;
  * Created by shiki60215 on 18-3-1.
  */
 
-public class HomepageCardAdapter extends MultiAxisCardAdapter implements View.OnClickListener {
+public class HomepageCardAdapter extends MultiAxisCardAdapter {
 
     public HomepageCardAdapter(Context context, SparseArray<Object> items, int vertical_view_id, int horizontal_view_id) {
         super(context, items, vertical_view_id, horizontal_view_id);
@@ -65,7 +66,7 @@ public class HomepageCardAdapter extends MultiAxisCardAdapter implements View.On
         super.onBindViewHolder(holder, position);
     }
 
-    class H_PhotoCardViewHolder extends HorizontalCardViewHolder {
+    class H_PhotoCardViewHolder extends HorizontalCardViewHolder implements View.OnClickListener {
 
         @BindView(R.id.photo)
         SimpleDraweeView photo;
@@ -103,11 +104,38 @@ public class HomepageCardAdapter extends MultiAxisCardAdapter implements View.On
 //            photo.setImageURI(item.getUri());
             title.setText(item.getTitle());
             itemView.setTag(item);
-            itemView.setOnClickListener(HomepageCardAdapter.this);
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(final View view) {
+            Object item = view.getTag();
+            final AppCompatActivity activity = (AppCompatActivity) view.getContext();
+            if (item instanceof BeanHorizontalCards) {
+                final Intent destIntent = new Intent(activity, ActivityCardDetail.class);
+                destIntent.putExtra("uri", ((BeanHorizontalCards) item).getUri());
+                destIntent.putExtra("title", ((BeanHorizontalCards) item).getTitle());
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    if (view.getTop() < 0) {
+                        final MultiAxisCardRecyclerView recyclerView = (MultiAxisCardRecyclerView) view.getParent();
+                        recyclerView.smoothScrollToPosition(recyclerView.getChildAdapterPosition(view), new ScrollAnimatorObserver() {
+                            @Override
+                            public void end() {
+                                if (view != null && activity != null && destIntent != null)
+                                    startActivityTransition(view, activity, destIntent);
+                            }
+                        });
+                    } else {
+                        startActivityTransition(view, activity, destIntent);
+                    }
+                } else {
+                    activity.startActivity(destIntent);
+                }
+            }
         }
     }
 
-    class V_TitleViewHolder extends VerticalCardViewHolder {
+    class V_TitleViewHolder extends VerticalCardViewHolder implements View.OnClickListener {
 
         @BindView(R.id.title)
         AppCompatTextView title;
@@ -123,35 +151,17 @@ public class HomepageCardAdapter extends MultiAxisCardAdapter implements View.On
         @Override
         public void initView(int v_card_position, int h_card_position) {
             title.setText((String) items.get(v_card_position));
+            more.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            final AppCompatActivity activity = (AppCompatActivity) v.getContext();
+            Intent destIntent = new Intent(activity, SVGActivity.class);
+            activity.startActivity(destIntent);
         }
     }
 
-    @Override
-    public void onClick(final View view) {
-        Object item = view.getTag();
-        final AppCompatActivity activity = (AppCompatActivity) view.getContext();
-        if (item instanceof BeanHorizontalCards) {
-            final Intent destIntent = new Intent(activity, ActivityCardDetail.class);
-            destIntent.putExtra("uri", ((BeanHorizontalCards) item).getUri());
-            destIntent.putExtra("title", ((BeanHorizontalCards) item).getTitle());
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                if (view.getTop() < 0) {
-                    final MultiAxisCardRecyclerView recyclerView = (MultiAxisCardRecyclerView) view.getParent();
-                    recyclerView.smoothScrollToPosition(recyclerView.getChildAdapterPosition(view), new ScrollAnimatorObserver() {
-                        @Override
-                        public void end() {
-                            if (view != null && activity != null && destIntent != null)
-                                startActivityTransition(view, activity, destIntent);
-                        }
-                    });
-                } else {
-                    startActivityTransition(view, activity, destIntent);
-                }
-            } else {
-                activity.startActivity(destIntent);
-            }
-        }
-    }
 
     @TargetApi(21)
     private void startActivityTransition(View view, AppCompatActivity activity, Intent destIntent) {

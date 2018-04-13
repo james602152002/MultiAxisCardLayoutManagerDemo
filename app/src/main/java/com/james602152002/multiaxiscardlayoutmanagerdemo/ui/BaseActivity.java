@@ -3,6 +3,7 @@ package com.james602152002.multiaxiscardlayoutmanagerdemo.ui;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.transition.ChangeBounds;
@@ -53,7 +54,10 @@ public class BaseActivity extends AppCompatActivity {
     protected final void initToolBar(Toolbar toolbar) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             setSupportActionBar(toolbar);
-            ((FrameLayout.LayoutParams)toolbar.getLayoutParams()).topMargin = getStatusBarHeight();
+            if (toolbar.getLayoutParams() instanceof FrameLayout.LayoutParams)
+                ((FrameLayout.LayoutParams) toolbar.getLayoutParams()).topMargin = getStatusBarHeight();
+            if (toolbar.getLayoutParams() instanceof ConstraintLayout.LayoutParams)
+                ((ConstraintLayout.LayoutParams) toolbar.getLayoutParams()).topMargin = getStatusBarHeight();
         } else {
             getSupportActionBar().hide();
         }

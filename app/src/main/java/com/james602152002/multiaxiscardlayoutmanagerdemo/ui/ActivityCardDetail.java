@@ -87,7 +87,7 @@ public class ActivityCardDetail extends BaseActivity {
         mToolbar.addView(view);
 
         CollapsingToolbarLayout.LayoutParams imgParams = (CollapsingToolbarLayout.LayoutParams) image.getLayoutParams();
-        imgParams.height = IPhone6ScreenResizeUtil.getPxValue(400);
+        imgParams.height = IPhone6ScreenResizeUtil.getPxValue(350);
         image.setImageURI(getIntent().getStringExtra("uri"));
     }
 

@@ -4,30 +4,31 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
-import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.james602152002.multiaxiscardlayoutmanagerdemo.R;
+import com.james602152002.multiaxiscardlayoutmanagerdemo.adapter.SvgCardAdapter;
+import com.james602152002.multiaxiscardlayoutmanagerdemo.bean.BeanSvgCard;
+import com.james602152002.multiaxiscardlayoutmanagerdemo.recyclerview.item_decoration.SvgCardDecoration;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.util.IPhone6ScreenResizeUtil;
-import com.jaredrummler.android.widget.AnimatedSvgView;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 
-public class SVGActivity extends AppCompatActivity implements View.OnClickListener {
+public class SVGActivity extends AppCompatActivity {
 
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
-    @BindView(R.id.google_animated_svg_view)
-    AnimatedSvgView googleSvgView;
-    @BindView(R.id.ailinklaw_animated_svg_view)
-    AnimatedSvgView ailinklawSvgView;
-    @BindView(R.id.logo_animated_svg_view)
-    AnimatedSvgView logoSvgView;
+    @BindView(R.id.recycler_view)
+    RecyclerView recyclerView;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -35,6 +36,7 @@ public class SVGActivity extends AppCompatActivity implements View.OnClickListen
         setContentView(R.layout.activity_svg);
         ButterKnife.bind(this);
         initToolBar();
+        initView();
     }
 
     private void initToolBar() {
@@ -50,19 +52,18 @@ public class SVGActivity extends AppCompatActivity implements View.OnClickListen
         mToolbar.addView(view);
     }
 
-    @Override
-    @OnClick({R.id.google_animated_svg_view, R.id.ailinklaw_animated_svg_view, R.id.logo_animated_svg_view})
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.google_animated_svg_view:
-                googleSvgView.start();
-                break;
-            case R.id.ailinklaw_animated_svg_view:
-                ailinklawSvgView.start();
-                break;
-            case R.id.logo_animated_svg_view:
-                logoSvgView.start();
-                break;
-        }
+    private void initView() {
+        List<BeanSvgCard> items = new ArrayList<>();
+        BeanSvgCard item = new BeanSvgCard(R.array.google_glyph_strings, R.array.google_glyph_colors);
+        items.add(item);
+        item = new BeanSvgCard(R.array.ailinklaw_glyph_strings, R.array.ailinklaw_glyph_colors);
+        items.add(item);
+        item = new BeanSvgCard(R.array.logo_glyph_strings, R.array.logo_glyph_colors);
+        items.add(item);
+        SvgCardAdapter adapter = new SvgCardAdapter(this, items);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        recyclerView.addItemDecoration(new SvgCardDecoration());
+        recyclerView.setAdapter(adapter);
     }
+
 }

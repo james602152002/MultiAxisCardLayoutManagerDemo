@@ -8,6 +8,8 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -16,6 +18,7 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Gravity;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.R;
@@ -38,6 +41,7 @@ import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -56,6 +60,8 @@ public class ActivityCardDetail extends BaseActivity {
     SmartRefreshLayout smartRefreshLayout;
     @BindView(R.id.toolbar_image)
     SimpleDraweeView image;
+    @BindView(R.id.action_btn)
+    FloatingActionButton actionBtn;
     private final List<BeanCardDetailListItems> data = new ArrayList<>();
 
     @Override
@@ -241,6 +247,12 @@ public class ActivityCardDetail extends BaseActivity {
                 image.setTransitionName(null);
         } else if (resultCode == UCrop.RESULT_ERROR) {
             final Throwable cropError = UCrop.getError(data);
+            Snackbar.make(recyclerView, cropError.getMessage(), Toast.LENGTH_SHORT);
         }
+    }
+
+    @OnClick(R.id.action_btn)
+    protected void clickActionButton() {
+        recyclerView.smoothScrollToPosition(0);
     }
 }

@@ -21,6 +21,7 @@ public class ScrollToTopBehavior extends CoordinatorLayout.Behavior<FloatingActi
     private FloatingActionButton actionButton;
     private ObjectAnimator transitionAnimator;
     private int parent_height;
+    private float action_btn_height;
     private boolean show = false;
     private RecyclerView.OnScrollListener listener;
 
@@ -77,7 +78,8 @@ public class ScrollToTopBehavior extends CoordinatorLayout.Behavior<FloatingActi
         final CoordinatorLayout.LayoutParams lp = (CoordinatorLayout.LayoutParams) child.getLayoutParams();
         final int dest_x = parent.getWidth() - child.getWidth() - lp.rightMargin;
         parent_height = parent.getHeight();
-        dest_y = parent_height - child.getHeight() - lp.bottomMargin;
+        action_btn_height = child.getHeight();
+        dest_y = parent_height - action_btn_height - lp.bottomMargin;
         child.setTranslationX(dest_x);
         child.setTranslationY(parent_height);
         return super.onMeasureChild(parent, child, parentWidthMeasureSpec, widthUsed, parentHeightMeasureSpec, heightUsed);
@@ -118,8 +120,12 @@ public class ScrollToTopBehavior extends CoordinatorLayout.Behavior<FloatingActi
 
     private void setFloatingBtnTransition(float ratio) {
         actionButton.setAlpha(ratio);
-        actionButton.setRotation((1 - ratio) * 270);
+        final float width = parent_height - dest_y;
         actionButton.setTranslationY((dest_y - parent_height) * ratio + parent_height);
+        ratio = (parent_height - actionButton.getTranslationY() - action_btn_height) / (width - action_btn_height);
+        if (ratio < 0)
+            ratio = 0;
+        actionButton.setRotation((1 - ratio) * 180);
     }
 
     @Override

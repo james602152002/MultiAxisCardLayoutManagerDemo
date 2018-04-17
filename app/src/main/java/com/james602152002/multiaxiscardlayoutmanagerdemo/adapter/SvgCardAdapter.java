@@ -10,16 +10,18 @@ import android.view.ViewGroup;
 
 import com.james602152002.multiaxiscardlayoutmanagerdemo.R;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.bean.BeanSvgCard;
+import com.james602152002.multiaxiscardlayoutmanagerdemo.recyclerview.item_touch_helper.ItemMoveAdapter;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.util.IPhone6ScreenResizeUtil;
 import com.jaredrummler.android.widget.AnimatedSvgView;
 
+import java.util.Collections;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class SvgCardAdapter extends RecyclerView.Adapter<SvgCardAdapter.SvgCardViewHolder> {
+public class SvgCardAdapter extends RecyclerView.Adapter<SvgCardAdapter.SvgCardViewHolder> implements ItemMoveAdapter {
 
     private final LayoutInflater inflater;
     private final List<BeanSvgCard> items;
@@ -73,6 +75,17 @@ public class SvgCardAdapter extends RecyclerView.Adapter<SvgCardAdapter.SvgCardV
         public void onClick(View v) {
             ((AnimatedSvgView) v).start();
         }
+
+    }
+
+    @Override
+    public void move(int fromPos, int toPos) {
+        Collections.swap(items, fromPos, toPos);
+        notifyItemMoved(fromPos, toPos);
+    }
+
+    @Override
+    public void swipe(int pos) {
 
     }
 }

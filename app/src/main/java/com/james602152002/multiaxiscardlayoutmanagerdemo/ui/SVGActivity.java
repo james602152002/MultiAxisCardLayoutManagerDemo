@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Gravity;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -15,6 +16,8 @@ import com.james602152002.multiaxiscardlayoutmanagerdemo.R;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.adapter.SvgCardAdapter;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.bean.BeanSvgCard;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.recyclerview.item_decoration.SvgCardDecoration;
+import com.james602152002.multiaxiscardlayoutmanagerdemo.recyclerview.item_touch_helper.CardDetailItemTouchHelperCallBack;
+import com.james602152002.multiaxiscardlayoutmanagerdemo.recyclerview.item_touch_helper.ItemMoveAdapter;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.util.IPhone6ScreenResizeUtil;
 
 import java.util.ArrayList;
@@ -64,6 +67,9 @@ public class SVGActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         recyclerView.addItemDecoration(new SvgCardDecoration());
         recyclerView.setAdapter(adapter);
+        CardDetailItemTouchHelperCallBack callBack = new CardDetailItemTouchHelperCallBack((ItemMoveAdapter) adapter);
+        ItemTouchHelper touchHelper = new ItemTouchHelper(callBack);
+        touchHelper.attachToRecyclerView(recyclerView);
     }
 
 }

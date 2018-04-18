@@ -30,6 +30,10 @@
             android:theme="@style/ToolBarTheme" />
 
         <activity
+            android:name=".ui.PersonalCenterActivity"
+            android:theme="@style/AppTheme" />
+
+        <activity
             android:name="com.yalantis.ucrop.UCropActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
     </application>

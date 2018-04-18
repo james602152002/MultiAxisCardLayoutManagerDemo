@@ -57,4 +57,5 @@ dependencies {
     implementation 'com.yanzhenjie:permission:2.0.0-rc2'
 
     implementation 'com.jaredrummler:animated-svg-view:1.0.5'
+    implementation 'com.github.iammert:ScalingLayout:1.2'
 }

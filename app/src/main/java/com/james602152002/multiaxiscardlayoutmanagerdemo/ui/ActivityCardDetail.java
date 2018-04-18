@@ -1,15 +1,11 @@
 package com.james602152002.multiaxiscardlayoutmanagerdemo.ui;
 
-import android.content.Intent;
 import android.graphics.Color;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -18,7 +14,6 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Gravity;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.R;
@@ -33,7 +28,6 @@ import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.listener.OnLoadMoreListener;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
-import com.yalantis.ucrop.UCrop;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -237,22 +231,13 @@ public class ActivityCardDetail extends TranslucentActivity {
                 });
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK && requestCode == UCrop.REQUEST_CROP) {
-            final Uri resultUri = UCrop.getOutput(data);
-            image.setImageURI(resultUri);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-                image.setTransitionName(null);
-        } else if (resultCode == UCrop.RESULT_ERROR) {
-            final Throwable cropError = UCrop.getError(data);
-            Snackbar.make(recyclerView, cropError.getMessage(), Toast.LENGTH_SHORT);
-        }
-    }
 
     @OnClick(R.id.action_btn)
     protected void clickActionButton() {
         recyclerView.smoothScrollToPosition(0);
+    }
+
+    public SimpleDraweeView getImage() {
+        return image;
     }
 }

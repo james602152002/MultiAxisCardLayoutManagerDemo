@@ -192,7 +192,6 @@ public class HomepageCardAdapter extends MultiAxisCardAdapter {
                 }
             }
         });
-        photo.setTransitionName("photo");
         activity.startActivity(destIntent, ActivityOptions.makeSceneTransitionAnimation(activity, photo, "photo").toBundle());
     }
 }

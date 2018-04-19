@@ -19,4 +19,5 @@
     </string-array>
 
     <string name="scroll_to_top_behavior">.behavior.ScrollToTopBehavior</string>
+    <string name="personal_center_behavior">.behavior.PersonalCenterBehavior</string>
 </resources>

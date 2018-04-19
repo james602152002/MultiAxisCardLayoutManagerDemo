@@ -8,10 +8,12 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
+import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -66,6 +68,10 @@ public class PersonalCenterActivity extends TranslucentActivity implements View.
     CardView avatarCard;
     @BindView(R.id.appbar)
     AppBarLayout appbar;
+    @BindView(R.id.edit)
+    AppCompatTextView edit;
+    @BindView(R.id.photo)
+    AppCompatTextView photo;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -100,13 +106,10 @@ public class PersonalCenterActivity extends TranslucentActivity implements View.
     }
 
     private void initView() {
-        CoordinatorLayout.LayoutParams spaceParams = (CoordinatorLayout.LayoutParams) appbar.getLayoutParams();
-        spaceParams.bottomMargin = IPhone6ScreenResizeUtil.getPxValue(150);
-
         CoordinatorLayout.LayoutParams imgParams = (CoordinatorLayout.LayoutParams) avatarCard.getLayoutParams();
-        imgParams.height = IPhone6ScreenResizeUtil.getPxValue(300);
-        imgParams.width = IPhone6ScreenResizeUtil.getPxValue(300);
-        imgParams.topMargin = IPhone6ScreenResizeUtil.getPxValue(200);
+        imgParams.height = IPhone6ScreenResizeUtil.getPxValue(400);
+        imgParams.width = IPhone6ScreenResizeUtil.getPxValue(400);
+        imgParams.topMargin = IPhone6ScreenResizeUtil.getPxValue(150);
 
         final ImageRequest request = ImageRequestBuilder.newBuilderWithSource((Uri) getIntent().getParcelableExtra("avatar"))
                 .setProgressiveRenderingEnabled(true)
@@ -117,6 +120,11 @@ public class PersonalCenterActivity extends TranslucentActivity implements View.
                 .build();
         avatar.setController(controller);
         avatar.setTag(request);
+
+        final int text_height = IPhone6ScreenResizeUtil.getPxValue(80);
+        ((ConstraintLayout.LayoutParams)edit.getLayoutParams()).height = text_height;
+        ((ConstraintLayout.LayoutParams)photo.getLayoutParams()).height = text_height;
+
 
 //        smartRefreshLayout.setOnRefreshListener(new OnRefreshListener() {
 //            @Override

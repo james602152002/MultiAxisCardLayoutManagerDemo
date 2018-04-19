@@ -13,6 +13,7 @@ import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
+import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
@@ -56,6 +57,8 @@ import butterknife.OnClick;
 
 public class PersonalCenterActivity extends TranslucentActivity implements View.OnClickListener {
 
+    @BindView(R.id.appbar)
+    AppBarLayout appbar;
     @BindView(R.id.toolbar_image)
     SimpleDraweeView image;
     @BindView(R.id.recycler_view)
@@ -66,12 +69,14 @@ public class PersonalCenterActivity extends TranslucentActivity implements View.
     SimpleDraweeView avatar;
     @BindView(R.id.avatar_card)
     CardView avatarCard;
-    @BindView(R.id.appbar)
-    AppBarLayout appbar;
+    @BindView(R.id.camera_btn)
+    CardView cameraBtn;
+    @BindView(R.id.camera_img)
+    AppCompatImageView cameraImg;
     @BindView(R.id.edit)
     AppCompatTextView edit;
-    @BindView(R.id.photo)
-    AppCompatTextView photo;
+    @BindView(R.id.take_pic)
+    AppCompatTextView take_pic;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -107,9 +112,9 @@ public class PersonalCenterActivity extends TranslucentActivity implements View.
 
     private void initView() {
         CoordinatorLayout.LayoutParams imgParams = (CoordinatorLayout.LayoutParams) avatarCard.getLayoutParams();
-        imgParams.height = IPhone6ScreenResizeUtil.getPxValue(400);
-        imgParams.width = IPhone6ScreenResizeUtil.getPxValue(400);
-        imgParams.topMargin = IPhone6ScreenResizeUtil.getPxValue(150);
+        imgParams.height = IPhone6ScreenResizeUtil.getPxValue(300);
+        imgParams.width = IPhone6ScreenResizeUtil.getPxValue(300);
+        imgParams.topMargin = IPhone6ScreenResizeUtil.getPxValue(200);
 
         final ImageRequest request = ImageRequestBuilder.newBuilderWithSource((Uri) getIntent().getParcelableExtra("avatar"))
                 .setProgressiveRenderingEnabled(true)
@@ -119,11 +124,16 @@ public class PersonalCenterActivity extends TranslucentActivity implements View.
                 .setOldController(avatar.getController())
                 .build();
         avatar.setController(controller);
-        avatar.setTag(request);
+        cameraBtn.setTag(request);
+
+        final int camera_img_width = IPhone6ScreenResizeUtil.getPxValue(40);
+        CardView.LayoutParams cameraImgParams  = (CardView.LayoutParams)cameraImg.getLayoutParams();
+        cameraImgParams.width = camera_img_width;
+        cameraImgParams.height = camera_img_width;
 
         final int text_height = IPhone6ScreenResizeUtil.getPxValue(80);
-        ((ConstraintLayout.LayoutParams)edit.getLayoutParams()).height = text_height;
-        ((ConstraintLayout.LayoutParams)photo.getLayoutParams()).height = text_height;
+        ((ConstraintLayout.LayoutParams) edit.getLayoutParams()).height = text_height;
+        ((ConstraintLayout.LayoutParams) take_pic.getLayoutParams()).height = text_height;
 
 
 //        smartRefreshLayout.setOnRefreshListener(new OnRefreshListener() {
@@ -156,7 +166,7 @@ public class PersonalCenterActivity extends TranslucentActivity implements View.
     }
 
 
-    @OnClick(R.id.avatar)
+    @OnClick(R.id.camera_btn)
     @Override
     public void onClick(View v) {
         ImageRequest imageRequest = (ImageRequest) v.getTag();

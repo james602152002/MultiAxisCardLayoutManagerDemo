@@ -11,6 +11,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.content.ContextCompat;
@@ -32,9 +33,11 @@ import com.github.florent37.camerafragment.listeners.CameraFragmentResultListene
 import com.hluhovskyi.camerabutton.CameraButton;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.R;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.adapter.CameraGalleryAdapter;
+import com.james602152002.multiaxiscardlayoutmanagerdemo.recyclerview.item_decoration.CameraGalleryDecoration;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.util.IPhone6ScreenResizeUtil;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -67,8 +70,11 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
     View crop;
     @BindView(R.id.sure)
     View sure;
+    @BindView(R.id.toolbar)
+    Toolbar mToolbar;
     @BindView(R.id.recycler_view)
     RecyclerView recyclerView;
+    private boolean usingCamera = false;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -89,7 +95,6 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
 
     private void initToolBar() {
         CollapsingToolbarLayout mCToolbarLayout = findViewById(R.id.collapsing_toolbar_layout);
-        Toolbar mToolbar = findViewById(R.id.toolbar);
         mCToolbarLayout.setCollapsedTitleTextColor(0);
         mCToolbarLayout.setExpandedTitleColor(0);
         // Set the support action bar
@@ -110,13 +115,25 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
         appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
             @Override
             public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
-                if (verticalOffset + appBarLayout.getTotalScrollRange() == 0) {
+                if (usingCamera) {
+                    return;
+                }
+
+                final int total_scroll_range = appBarLayout.getTotalScrollRange();
+                final int dy = verticalOffset + total_scroll_range;
+                int alpha = ((int) (0xFF * (-(float) verticalOffset / total_scroll_range)) << 24) + 0xFFFFFF;
+                int color = ContextCompat.getColor(appBarLayout.getContext(), R.color.colorPrimary);
+                color = color & alpha;
+                appBarLayout.setBackgroundColor(color);
+                content.setAlpha(dy / total_scroll_range);
+//                mToolbar.setBackgroundColor(color);
+                if (dy == 0) {
                     if (content.getVisibility() == View.VISIBLE) {
                         content.setVisibility(View.GONE);
                         cameraButton.setVisibility(View.GONE);
                         getSupportFragmentManager().beginTransaction().detach(cameraFragment).commit();
                     }
-                } else if (content.getVisibility() == View.GONE) {
+                } else if (verticalOffset == 0 && content.getVisibility() == View.GONE) {
                     content.setVisibility(View.VISIBLE);
                     cameraButton.setVisibility(View.VISIBLE);
                     getSupportFragmentManager().beginTransaction().attach(cameraFragment).commit();
@@ -131,22 +148,32 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
         cameraHeaderParams.width = IPhone6ScreenResizeUtil.getCurrentScreenWidth();
         cameraHeaderParams.height = IPhone6ScreenResizeUtil.getCurrentScreenHeight();
 
+        ConstraintLayout.LayoutParams photoParams = (ConstraintLayout.LayoutParams) photo.getLayoutParams();
+        photoParams.width = IPhone6ScreenResizeUtil.getCurrentScreenWidth();
+        photoParams.height = IPhone6ScreenResizeUtil.getCurrentScreenHeight();
+
         cameraButton.setOnPhotoEventListener(new CameraButton.OnPhotoEventListener() {
             @Override
             public void onClick() {
                 cameraFragment.takePhotoOrCaptureVideo(new CameraFragmentResultListener() {
                     @Override
                     public void onVideoRecorded(String filePath) {
-
+                        usingCamera = true;
                     }
 
                     @Override
                     public void onPhotoTaken(byte[] bytes, String filePath) {
+                        usingCamera = true;
                         content.setVisibility(View.GONE);
                         cameraButton.setVisibility(View.GONE);
                         getSupportFragmentManager().beginTransaction().detach(cameraFragment).commit();
                         File file = new File(filePath);
                         Uri uri = Uri.fromFile(file);
+                        try {
+                            MediaStore.Images.Media.insertImage(getContentResolver(), filePath, file.getName(), "crop_photos");
+                        } catch (FileNotFoundException exception) {
+
+                        }
                         photo.setImageURI(uri);
                         photo.setTag(uri);
                         showPhoto();
@@ -185,6 +212,7 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
         });
 
         recyclerView.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
+        recyclerView.addItemDecoration(new CameraGalleryDecoration());
         observable.subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<Cursor>() {
                     @Override
@@ -219,6 +247,7 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
 //        anim.setDuration(duration);
 //        photo.startAnimation(anim);
 
+//        btnGroup.setVisibility(View.VISIBLE);
         TranslateAnimation translateAnimation = new TranslateAnimation(Animation.RELATIVE_TO_SELF, 0, Animation.RELATIVE_TO_SELF, 0,
                 Animation.RELATIVE_TO_SELF, 1, Animation.RELATIVE_TO_SELF, 0);
         translateAnimation.setDuration(duration);

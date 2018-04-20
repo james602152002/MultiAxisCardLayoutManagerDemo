@@ -1,19 +1,22 @@
 package com.james602152002.multiaxiscardlayoutmanagerdemo.ui;
 
 import android.Manifest;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.annotation.Nullable;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Gravity;
 import android.view.View;
 import android.view.animation.Animation;
@@ -28,15 +31,10 @@ import com.github.florent37.camerafragment.configuration.Configuration;
 import com.github.florent37.camerafragment.listeners.CameraFragmentResultListener;
 import com.hluhovskyi.camerabutton.CameraButton;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.R;
-import com.james602152002.multiaxiscardlayoutmanagerdemo.adapter.SvgCardAdapter;
-import com.james602152002.multiaxiscardlayoutmanagerdemo.bean.BeanSvgCard;
-import com.james602152002.multiaxiscardlayoutmanagerdemo.recyclerview.item_decoration.SvgCardDecoration;
-import com.james602152002.multiaxiscardlayoutmanagerdemo.recyclerview.item_touch_helper.CardDetailItemTouchHelperCallBack;
+import com.james602152002.multiaxiscardlayoutmanagerdemo.adapter.CameraGalleryAdapter;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.util.IPhone6ScreenResizeUtil;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -53,6 +51,8 @@ import io.reactivex.schedulers.Schedulers;
 public class ActivityCamera extends ActivityTranslucent implements View.OnClickListener {
 
     private CameraFragment cameraFragment;
+    @BindView(R.id.appbar)
+    AppBarLayout appBarLayout;
     @BindView(R.id.camera_header)
     View cameraHeader;
     @BindView(R.id.photo)
@@ -94,6 +94,8 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
         mCToolbarLayout.setExpandedTitleColor(0);
         // Set the support action bar
         initToolBar(mToolbar);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP)
+            ((FrameLayout.LayoutParams) mToolbar.getLayoutParams()).topMargin = getStatusBarHeight();
 
         LinearLayout view = new LinearLayout(this);
         view.setGravity(Gravity.CENTER_VERTICAL);
@@ -104,6 +106,23 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
         IPhone6ScreenResizeUtil.adjustTextSize(text_view, 34);
         view.addView(text_view);
         mToolbar.addView(view);
+
+        appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
+            @Override
+            public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+                if (verticalOffset + appBarLayout.getTotalScrollRange() == 0) {
+                    if (content.getVisibility() == View.VISIBLE) {
+                        content.setVisibility(View.GONE);
+                        cameraButton.setVisibility(View.GONE);
+                        getSupportFragmentManager().beginTransaction().detach(cameraFragment).commit();
+                    }
+                } else if (content.getVisibility() == View.GONE) {
+                    content.setVisibility(View.VISIBLE);
+                    cameraButton.setVisibility(View.VISIBLE);
+                    getSupportFragmentManager().beginTransaction().attach(cameraFragment).commit();
+                }
+            }
+        });
     }
 
 
@@ -138,24 +157,34 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
 
         cameraButton.setProgressArcColors(new int[]{ContextCompat.getColor(this, R.color.colorPrimary), Color.BLUE});
 
-
-
-//        Uri mImageUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-//        ContentResolver mContentResolver = getContentResolver();
-//
-//        String[] projection = new String[]{MediaStore.Images.Media.MIME_TYPE,
-//                MediaStore.Images.Media.DATE_MODIFIED, MediaStore.Images.Media.DATA};
-//        // 只查询jpeg和png的图片
-//        Cursor mCursor = mContentResolver.query(mImageUri, projection,
-//                MediaStore.Images.Media.MIME_TYPE + "=? or " + MediaStore.Images.Media.MIME_TYPE + "=?",
-//                new String[]{"image/jpeg", "image/png"}, MediaStore.Images.Media.DATE_MODIFIED);
         final CompositeDisposable disposable = new CompositeDisposable();
         Observable<Cursor> observable = Observable.create(new ObservableOnSubscribe<Cursor>() {
             @Override
-            public void subscribe(ObservableEmitter<Cursor> emitter) throws Exception {
+            public void subscribe(ObservableEmitter<Cursor> emitter) {
+                try {
+                    Uri mImageUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+                    ContentResolver mContentResolver = getContentResolver();
 
+                    String[] projection = new String[]{MediaStore.Images.Media.MIME_TYPE,
+                            MediaStore.Images.Media.DATE_MODIFIED, MediaStore.Images.Media.DATA};
+                    // 只查询jpeg和png的图片
+                    Cursor mCursor = mContentResolver.query(mImageUri, projection,
+                            MediaStore.Images.Media.MIME_TYPE + "=? or " + MediaStore.Images.Media.MIME_TYPE + "=?",
+                            new String[]{"image/jpeg", "image/png"}, MediaStore.Images.ImageColumns.DATE_TAKEN + " DESC");
+//                    MediaStore.Images.Media.DATE_ADDED + " DESC"
+                    if (mCursor != null) {
+                        emitter.onNext(mCursor);
+                        emitter.onComplete();
+                    } else {
+                        emitter.onError(new Throwable());
+                    }
+                } catch (Exception e) {
+
+                }
             }
         });
+
+        recyclerView.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
         observable.subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<Cursor>() {
                     @Override
@@ -165,7 +194,8 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
 
                     @Override
                     public void onNext(Cursor cursor) {
-
+                        CameraGalleryAdapter adapter = new CameraGalleryAdapter(ActivityCamera.this, cursor);
+                        recyclerView.setAdapter(adapter);
                     }
 
                     @Override
@@ -180,20 +210,6 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
                         disposable.clear();
                     }
                 });
-        List<BeanSvgCard> items = new ArrayList<>();
-        BeanSvgCard item = new BeanSvgCard(R.array.google_glyph_strings, R.array.google_glyph_colors);
-        items.add(item);
-        item = new BeanSvgCard(R.array.ailinklaw_glyph_strings, R.array.ailinklaw_glyph_colors);
-        items.add(item);
-        item = new BeanSvgCard(R.array.logo_glyph_strings, R.array.logo_glyph_colors);
-        items.add(item);
-        SvgCardAdapter adapter = new SvgCardAdapter(this, items);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-        recyclerView.addItemDecoration(new SvgCardDecoration());
-        recyclerView.setAdapter(adapter);
-        CardDetailItemTouchHelperCallBack callBack = new CardDetailItemTouchHelperCallBack(adapter);
-        ItemTouchHelper touchHelper = new ItemTouchHelper(callBack);
-        touchHelper.attachToRecyclerView(recyclerView);
     }
 
     private void showPhoto() {

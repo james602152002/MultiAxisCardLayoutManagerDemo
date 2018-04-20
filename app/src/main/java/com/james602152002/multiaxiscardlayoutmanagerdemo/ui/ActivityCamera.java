@@ -197,7 +197,7 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
                     // 只查询jpeg和png的图片
                     Cursor mCursor = mContentResolver.query(mImageUri, projection,
                             MediaStore.Images.Media.MIME_TYPE + "=? or " + MediaStore.Images.Media.MIME_TYPE + "=?",
-                            new String[]{"image/jpeg", "image/png"}, MediaStore.Images.ImageColumns.DATE_TAKEN + " DESC");
+                            new String[]{"image/jpeg", "image/png"}, MediaStore.Images.ImageColumns.DATE_TAKEN + " ASC");
 //                    MediaStore.Images.Media.DATE_ADDED + " DESC"
                     if (mCursor != null) {
                         emitter.onNext(mCursor);
@@ -247,7 +247,7 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
 //        anim.setDuration(duration);
 //        photo.startAnimation(anim);
 
-//        btnGroup.setVisibility(View.VISIBLE);
+        btnGroup.setVisibility(View.VISIBLE);
         TranslateAnimation translateAnimation = new TranslateAnimation(Animation.RELATIVE_TO_SELF, 0, Animation.RELATIVE_TO_SELF, 0,
                 Animation.RELATIVE_TO_SELF, 1, Animation.RELATIVE_TO_SELF, 0);
         translateAnimation.setDuration(duration);

@@ -24,6 +24,7 @@ android {
 ext {
 //    ext.supportLibVersion = '28.0.0-alpha1'
     supportLibVersion = '27.1.0'
+    cameraBtnLibVersion = '2.0.1'
 }
 
 dependencies {
@@ -57,5 +58,9 @@ dependencies {
     implementation 'com.yanzhenjie:permission:2.0.0-rc2'
 
     implementation 'com.jaredrummler:animated-svg-view:1.0.5'
-    implementation 'com.github.iammert:ScalingLayout:1.2'
+    implementation 'com.github.florent37:camerafragment:1.0.9'
+
+    implementation "com.hluhovskyi.camerabutton:camerabutton:${cameraBtnLibVersion}"
+    implementation "com.hluhovskyi.camerabutton:camerabutton-rxjava2:${cameraBtnLibVersion}"
+    implementation "com.hluhovskyi.camerabutton:camerabutton-rxjava2-kotlin:${cameraBtnLibVersion}"
 }

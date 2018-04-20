@@ -25,7 +25,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class SVGActivity extends AppCompatActivity {
+public class ActivitySVG extends AppCompatActivity {
 
     @BindView(R.id.toolbar)
     Toolbar mToolbar;

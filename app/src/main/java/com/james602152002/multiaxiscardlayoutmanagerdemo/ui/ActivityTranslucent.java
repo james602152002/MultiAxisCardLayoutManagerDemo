@@ -16,7 +16,7 @@ import com.kelin.translucentbar.library.TranslucentBarManager;
  * Created by shiki60215 on 18-3-5.
  */
 
-public class TranslucentActivity extends AppCompatActivity {
+public class ActivityTranslucent extends AppCompatActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

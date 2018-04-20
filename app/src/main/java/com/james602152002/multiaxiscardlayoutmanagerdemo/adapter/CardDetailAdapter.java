@@ -35,7 +35,7 @@ import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.R;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.bean.BeanCardDetailListItems;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.recyclerview.item_touch_helper.ItemMoveAdapter;
-import com.james602152002.multiaxiscardlayoutmanagerdemo.ui.PersonalCenterActivity;
+import com.james602152002.multiaxiscardlayoutmanagerdemo.ui.ActivityPersonalCenter;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.util.DOMUtil;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.util.IPhone6ScreenResizeUtil;
 
@@ -209,7 +209,7 @@ public class CardDetailAdapter extends RecyclerView.Adapter<CardDetailAdapter.Ca
 //                        .start((Activity) context);
 //            }
 //        }).start();
-        final Intent destIntent = new Intent(context, PersonalCenterActivity.class);
+        final Intent destIntent = new Intent(context, ActivityPersonalCenter.class);
         final Intent currentActivityIntent = ((AppCompatActivity) context).getIntent();
         destIntent.putExtra("uri", currentActivityIntent.getStringExtra("uri"));
         destIntent.putExtra("avatar", imageRequest.getSourceUri());

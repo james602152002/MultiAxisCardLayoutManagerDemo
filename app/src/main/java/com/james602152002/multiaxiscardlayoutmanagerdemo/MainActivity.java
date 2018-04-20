@@ -16,7 +16,7 @@ import com.james602152002.multiaxiscardlayoutmanager.ui.MultiAxisCardRecyclerVie
 import com.james602152002.multiaxiscardlayoutmanagerdemo.adapter.HomepageCardAdapter;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.bean.BeanHorizontalCards;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.recyclerview.item_decoration.MultiAxisCardDecoration;
-import com.james602152002.multiaxiscardlayoutmanagerdemo.ui.TranslucentActivity;
+import com.james602152002.multiaxiscardlayoutmanagerdemo.ui.ActivityTranslucent;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.util.DiffCallBackUtil;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.util.IPhone6ScreenResizeUtil;
 
@@ -27,7 +27,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class MainActivity extends TranslucentActivity implements View.OnClickListener {
+public class MainActivity extends ActivityTranslucent implements View.OnClickListener {
 
     @BindView(R.id.recycler_view)
     MultiAxisCardRecyclerView recyclerView;

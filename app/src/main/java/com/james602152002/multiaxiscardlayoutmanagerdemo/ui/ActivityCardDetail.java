@@ -46,7 +46,7 @@ import io.reactivex.disposables.Disposable;
  * Created by shiki60215 on 18-3-2.
  */
 
-public class ActivityCardDetail extends TranslucentActivity {
+public class ActivityCardDetail extends ActivityTranslucent {
 
     @BindView(R.id.recycler_view)
     RecyclerView recyclerView;

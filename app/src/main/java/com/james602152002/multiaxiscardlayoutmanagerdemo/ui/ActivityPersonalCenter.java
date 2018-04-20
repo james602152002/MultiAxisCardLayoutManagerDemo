@@ -55,7 +55,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class PersonalCenterActivity extends TranslucentActivity implements View.OnClickListener {
+public class ActivityPersonalCenter extends ActivityTranslucent implements View.OnClickListener {
 
     @BindView(R.id.appbar)
     AppBarLayout appbar;
@@ -124,10 +124,10 @@ public class PersonalCenterActivity extends TranslucentActivity implements View.
                 .setOldController(avatar.getController())
                 .build();
         avatar.setController(controller);
-        cameraBtn.setTag(request);
+        avatar.setTag(request);
 
         final int camera_img_width = IPhone6ScreenResizeUtil.getPxValue(40);
-        CardView.LayoutParams cameraImgParams  = (CardView.LayoutParams)cameraImg.getLayoutParams();
+        CardView.LayoutParams cameraImgParams = (CardView.LayoutParams) cameraImg.getLayoutParams();
         cameraImgParams.width = camera_img_width;
         cameraImgParams.height = camera_img_width;
 
@@ -166,41 +166,73 @@ public class PersonalCenterActivity extends TranslucentActivity implements View.
     }
 
 
-    @OnClick(R.id.camera_btn)
+    @OnClick({R.id.avatar, R.id.edit, R.id.camera_btn, R.id.take_pic})
     @Override
     public void onClick(View v) {
-        ImageRequest imageRequest = (ImageRequest) v.getTag();
-        CacheKey cacheKey = DefaultCacheKeyFactory.getInstance()
-                .getEncodedCacheKey(imageRequest, null);
-        BinaryResource resource = ImagePipelineFactory.getInstance().getMainFileCache()
-                .getResource(cacheKey);
-        final File file = ((FileBinaryResource) resource).getFile();
-        AndPermission.with(this).permission(Manifest.permission.WRITE_EXTERNAL_STORAGE).onGranted(new Action() {
-            @Override
-            public void onAction(List<String> permissions) {
-                File storageFolder = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/crop");
-                try {
-                    if (!storageFolder.exists())
-                        storageFolder.mkdir();
-                } catch (Exception e) {
+        switch (v.getId()) {
+            case R.id.avatar:
+            case R.id.edit:
+                ImageRequest imageRequest = (ImageRequest) avatar.getTag();
+                CacheKey cacheKey = DefaultCacheKeyFactory.getInstance()
+                        .getEncodedCacheKey(imageRequest, null);
+                BinaryResource resource = ImagePipelineFactory.getInstance().getMainFileCache()
+                        .getResource(cacheKey);
+                final File file = ((FileBinaryResource) resource).getFile();
+                AndPermission.with(this).permission(Manifest.permission.WRITE_EXTERNAL_STORAGE).onGranted(new Action() {
+                    @Override
+                    public void onAction(List<String> permissions) {
+                        File storageFolder = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/crop");
+                        try {
+                            if (!storageFolder.exists())
+                                storageFolder.mkdir();
+                        } catch (Exception e) {
 
-                }
+                        }
 
-                Uri destinationUri = Uri.fromFile(new File(storageFolder, new StringBuilder().append(System.currentTimeMillis()).append(".jpeg").toString()));
-                UCrop.of(Uri.fromFile(file), destinationUri)
-                        .start(PersonalCenterActivity.this);
-            }
-        }).start();
+                        Uri destinationUri = Uri.fromFile(new File(storageFolder, new StringBuilder().append(System.currentTimeMillis()).append(".jpeg").toString()));
+                        UCrop.of(Uri.fromFile(file), destinationUri)
+                                .start(ActivityPersonalCenter.this);
+                    }
+                }).start();
+                break;
+            case R.id.camera_btn:
+            case R.id.take_pic:
+                AndPermission.with(this).permission(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE).onGranted(new Action() {
+                    @Override
+                    public void onAction(List<String> permissions) {
+                        Intent destIntent = new Intent(ActivityPersonalCenter.this, ActivityCamera.class);
+                        startActivityForResult(destIntent, 100);
+                    }
+                }).start();
+                break;
+        }
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK && requestCode == UCrop.REQUEST_CROP) {
-            Uri resultUri = UCrop.getOutput(data);
-            avatar.setImageURI(resultUri);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-                avatar.setTransitionName(null);
+        if (resultCode == RESULT_OK) {
+            switch (requestCode) {
+                case UCrop.REQUEST_CROP:
+                    Uri resultUri = UCrop.getOutput(data);
+                    avatar.setImageURI(resultUri);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+                        avatar.setTransitionName(null);
+                    break;
+                case 100:
+                    File storageFolder = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/crop");
+                    try {
+                        if (!storageFolder.exists())
+                            storageFolder.mkdir();
+                    } catch (Exception e) {
+
+                    }
+                    Uri destinationUri = Uri.fromFile(new File(storageFolder, new StringBuilder().append(System.currentTimeMillis()).append(".jpeg").toString()));
+                    UCrop.of((Uri) data.getParcelableExtra("uri"), destinationUri)
+                            .start(ActivityPersonalCenter.this);
+                    break;
+            }
+
         } else if (resultCode == UCrop.RESULT_ERROR) {
             final Throwable cropError = UCrop.getError(data);
             Snackbar.make(recyclerView, cropError.getMessage(), Toast.LENGTH_SHORT);

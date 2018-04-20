@@ -33,7 +33,7 @@ import com.james602152002.multiaxiscardlayoutmanager.viewholder.VerticalCardView
 import com.james602152002.multiaxiscardlayoutmanagerdemo.R;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.bean.BeanHorizontalCards;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.ui.ActivityCardDetail;
-import com.james602152002.multiaxiscardlayoutmanagerdemo.ui.SVGActivity;
+import com.james602152002.multiaxiscardlayoutmanagerdemo.ui.ActivitySVG;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.util.IPhone6ScreenResizeUtil;
 
 import java.util.List;
@@ -158,7 +158,7 @@ public class HomepageCardAdapter extends MultiAxisCardAdapter {
         @OnClick(R.id.more)
         public void onClick(View v) {
             final Context activity = v.getContext();
-            final Intent destIntent = new Intent(activity, SVGActivity.class);
+            final Intent destIntent = new Intent(activity, ActivitySVG.class);
             ActivityCompat.startActivity(activity, destIntent, null);
         }
     }

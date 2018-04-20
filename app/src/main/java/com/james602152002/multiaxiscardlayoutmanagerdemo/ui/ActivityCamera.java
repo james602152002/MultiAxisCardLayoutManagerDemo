@@ -197,7 +197,7 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
                     // 只查询jpeg和png的图片
                     Cursor mCursor = mContentResolver.query(mImageUri, projection,
                             MediaStore.Images.Media.MIME_TYPE + "=? or " + MediaStore.Images.Media.MIME_TYPE + "=?",
-                            new String[]{"image/jpeg", "image/png"}, MediaStore.Images.ImageColumns.DATE_TAKEN + " ASC");
+                            new String[]{"image/jpeg", "image/png"}, MediaStore.Images.Media.DATE_ADDED + " DESC");
 //                    MediaStore.Images.Media.DATE_ADDED + " DESC"
                     if (mCursor != null) {
                         emitter.onNext(mCursor);

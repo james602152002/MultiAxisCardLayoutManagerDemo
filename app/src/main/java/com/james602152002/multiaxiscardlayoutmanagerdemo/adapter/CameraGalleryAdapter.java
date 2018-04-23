@@ -9,6 +9,7 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -83,10 +84,11 @@ public class CameraGalleryAdapter extends RecyclerView.Adapter<CameraGalleryAdap
             lp.dimensionRatio = ratioBuilder.append(options.outWidth).append(":").append(options.outHeight).toString();
             photo.setAspectRatio(aspect_ratio);
 
-            final int width = IPhone6ScreenResizeUtil.getCurrentScreenWidth() >> 1;
+            final StaggeredGridLayoutManager.LayoutParams managerParams = (StaggeredGridLayoutManager.LayoutParams) itemView.getLayoutParams();
+            final int width = (IPhone6ScreenResizeUtil.getCurrentScreenWidth() >> 1) - managerParams.leftMargin - managerParams.rightMargin;
             ImageDecodeOptions decodeOptions = ImageDecodeOptions.newBuilder().setBitmapConfig(Bitmap.Config.RGB_565).build();
             final ImageRequest request = ImageRequestBuilder.newBuilderWithSource(uri)
-                    .setResizeOptions(new ResizeOptions(width, (int)(width * aspect_ratio)))
+                    .setResizeOptions(new ResizeOptions(width, (int) (width * aspect_ratio)))
                     .setProgressiveRenderingEnabled(true).setImageDecodeOptions(decodeOptions)
                     .build();
             final DraweeController controller = Fresco.newDraweeControllerBuilder()

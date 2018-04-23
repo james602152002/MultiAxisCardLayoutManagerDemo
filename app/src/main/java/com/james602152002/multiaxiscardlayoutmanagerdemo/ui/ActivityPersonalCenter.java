@@ -1,6 +1,8 @@
 package com.james602152002.multiaxiscardlayoutmanagerdemo.ui;
 
 import android.Manifest;
+import android.app.ActivityOptions;
+import android.app.SharedElementCallback;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
@@ -13,6 +15,7 @@ import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.CardView;
@@ -22,6 +25,7 @@ import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Gravity;
 import android.view.View;
+import android.view.Window;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,7 +34,9 @@ import com.facebook.binaryresource.BinaryResource;
 import com.facebook.binaryresource.FileBinaryResource;
 import com.facebook.cache.common.CacheKey;
 import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.drawee.drawable.ScalingUtils;
 import com.facebook.drawee.interfaces.DraweeController;
+import com.facebook.drawee.view.DraweeTransition;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.imagepipeline.cache.DefaultCacheKeyFactory;
 import com.facebook.imagepipeline.core.ImagePipelineFactory;
@@ -201,7 +207,35 @@ public class ActivityPersonalCenter extends ActivityTranslucent implements View.
                     @Override
                     public void onAction(List<String> permissions) {
                         Intent destIntent = new Intent(ActivityPersonalCenter.this, ActivityCamera.class);
-                        startActivityForResult(destIntent, 100);
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            setExitSharedElementCallback(new SharedElementCallback() {
+
+                                @Override
+                                public void onSharedElementEnd(List<String> sharedElementNames,
+                                                               List<View> sharedElements,
+                                                               List<View> sharedElementSnapshots) {
+
+                                    super.onSharedElementEnd(sharedElementNames, sharedElements,
+                                            sharedElementSnapshots);
+
+                                    for (final View view : sharedElements) {
+                                        if (view == avatar) {
+                                            view.setVisibility(View.VISIBLE);
+                                        }
+                                    }
+                                }
+                            });
+                            Window window = getWindow();
+                            window.setSharedElementEnterTransition(DraweeTransition.createTransitionSet(
+                                    ScalingUtils.ScaleType.CENTER_CROP, ScalingUtils.ScaleType.CENTER_CROP));
+                            window.setSharedElementExitTransition(DraweeTransition.createTransitionSet(
+                                    ScalingUtils.ScaleType.CENTER_CROP, ScalingUtils.ScaleType.CENTER_CROP));
+                            ActivityCompat.startActivityForResult(ActivityPersonalCenter.this, destIntent,
+                                    100, ActivityOptions.makeSceneTransitionAnimation(ActivityPersonalCenter.this, avatar, "avatar").toBundle());
+                            avatar.setImageURI("");
+                        } else {
+                            startActivityForResult(destIntent, 100);
+                        }
                     }
                 }).start();
                 break;
@@ -220,22 +254,44 @@ public class ActivityPersonalCenter extends ActivityTranslucent implements View.
                         avatar.setTransitionName(null);
                     break;
                 case 100:
-                    File storageFolder = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/crop");
-                    try {
-                        if (!storageFolder.exists())
-                            storageFolder.mkdir();
-                    } catch (Exception e) {
+                    switch (data.getStringExtra("type")) {
+                        case "crop":
+                            avatar.setVisibility(View.VISIBLE);
+                            File storageFolder = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/crop");
+                            try {
+                                if (!storageFolder.exists())
+                                    storageFolder.mkdir();
+                            } catch (Exception e) {
 
+                            }
+                            Uri destinationUri = Uri.fromFile(new File(storageFolder, new StringBuilder().append(System.currentTimeMillis()).append(".jpeg").toString()));
+                            UCrop.of((Uri) data.getParcelableExtra("uri"), destinationUri)
+                                    .start(ActivityPersonalCenter.this);
+                            break;
+                        case "send":
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                avatar.setTransitionName(null);
+                            }
+                            avatar.setImageURI((Uri) data.getParcelableExtra("uri"));
+                            break;
                     }
-                    Uri destinationUri = Uri.fromFile(new File(storageFolder, new StringBuilder().append(System.currentTimeMillis()).append(".jpeg").toString()));
-                    UCrop.of((Uri) data.getParcelableExtra("uri"), destinationUri)
-                            .start(ActivityPersonalCenter.this);
+
                     break;
             }
 
         } else if (resultCode == UCrop.RESULT_ERROR) {
             final Throwable cropError = UCrop.getError(data);
             Snackbar.make(recyclerView, cropError.getMessage(), Toast.LENGTH_SHORT);
+        } else {
+            final ImageRequest request = ImageRequestBuilder.newBuilderWithSource((Uri) getIntent().getParcelableExtra("avatar"))
+                    .setProgressiveRenderingEnabled(true)
+                    .build();
+            final DraweeController controller = Fresco.newDraweeControllerBuilder()
+                    .setImageRequest(request)
+                    .setOldController(avatar.getController())
+                    .build();
+            avatar.setController(controller);
+            avatar.setTag(request);
         }
     }
 }

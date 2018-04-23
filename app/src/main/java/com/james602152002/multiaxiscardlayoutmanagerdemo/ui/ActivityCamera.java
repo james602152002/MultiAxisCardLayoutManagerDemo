@@ -21,8 +21,6 @@ import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.TranslateAnimation;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -34,6 +32,8 @@ import com.github.florent37.camerafragment.listeners.CameraFragmentResultListene
 import com.hluhovskyi.camerabutton.CameraButton;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.R;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.adapter.CameraGalleryAdapter;
+import com.james602152002.multiaxiscardlayoutmanagerdemo.fragment.CameraCropFragmentDialog;
+import com.james602152002.multiaxiscardlayoutmanagerdemo.interfaces.CameraCropListener;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.recyclerview.item_decoration.CameraGalleryDecoration;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.util.IPhone6ScreenResizeUtil;
 
@@ -61,16 +61,10 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
     View cameraHeader;
     @BindView(R.id.photo)
     SimpleDraweeView photo;
-    @BindView(R.id.btn_group)
-    View btnGroup;
     @BindView(R.id.camera_btn)
     CameraButton cameraButton;
     @BindView(R.id.content)
     FrameLayout content;
-    @BindView(R.id.crop)
-    View crop;
-    @BindView(R.id.sure)
-    View sure;
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
     @BindView(R.id.recycler_view)
@@ -244,31 +238,45 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
     }
 
     private void showPhoto() {
-        final int duration = 500;
-//        ScaleAnimation anim = new ScaleAnimation(0, 1, 0, 1,
-//                Animation.RELATIVE_TO_SELF, .5f, Animation.RELATIVE_TO_SELF, .5f);
-//        anim.setDuration(duration);
-//        photo.startAnimation(anim);
+        CameraCropFragmentDialog dialogFragment = new CameraCropFragmentDialog();
+        dialogFragment.setAction(null, null, null, new CameraCropListener() {
+            @Override
+            public void onCrop() {
+                Intent uriIntent = new Intent();
+                uriIntent.putExtra("type", "crop");
+                uriIntent.putExtra("uri", (Uri) photo.getTag());
+                setResult(RESULT_OK, uriIntent);
+                onBackPressed();
+            }
 
-        btnGroup.setVisibility(View.VISIBLE);
-        TranslateAnimation translateAnimation = new TranslateAnimation(Animation.RELATIVE_TO_SELF, 0, Animation.RELATIVE_TO_SELF, 0,
-                Animation.RELATIVE_TO_SELF, 1, Animation.RELATIVE_TO_SELF, 0);
-        translateAnimation.setDuration(duration);
-        btnGroup.startAnimation(translateAnimation);
+            @Override
+            public void onSend() {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+                    photo.setTransitionName("avatar");
+                Intent uriIntent = new Intent();
+                uriIntent.putExtra("uri", (Uri) photo.getTag());
+                uriIntent.putExtra("type", "send");
+                setResult(RESULT_OK, uriIntent);
+                onBackPressed();
+            }
+
+            @Override
+            public void onDismiss() {
+                if (content.getVisibility() == View.GONE) {
+                    content.setVisibility(View.VISIBLE);
+                    cameraButton.setVisibility(View.VISIBLE);
+                    getSupportFragmentManager().beginTransaction().attach(cameraFragment).commit();
+                    usingCamera = false;
+                }
+            }
+        });
+        dialogFragment.show(getSupportFragmentManager(), "show_crop_dialog");
     }
 
-    @OnClick({R.id.crop, R.id.sure , R.id.action_btn})
+    @OnClick({R.id.action_btn})
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.crop:
-                Intent uriIntent = new Intent();
-                uriIntent.putExtra("uri", (Uri) photo.getTag());
-                setResult(RESULT_OK, uriIntent);
-                finish();
-                break;
-            case R.id.sure:
-                break;
             case R.id.action_btn:
                 recyclerView.smoothScrollToPosition(0);
                 break;

@@ -14,6 +14,7 @@ import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -74,6 +75,8 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
     Toolbar mToolbar;
     @BindView(R.id.recycler_view)
     RecyclerView recyclerView;
+    @BindView(R.id.action_btn)
+    FloatingActionButton floatingActionButton;
     private boolean usingCamera = false;
 
     @Override
@@ -126,11 +129,11 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
                 color = color & alpha;
                 appBarLayout.setBackgroundColor(color);
                 content.setAlpha(dy / total_scroll_range);
-//                mToolbar.setBackgroundColor(color);
                 if (dy == 0) {
                     if (content.getVisibility() == View.VISIBLE) {
                         content.setVisibility(View.GONE);
                         cameraButton.setVisibility(View.GONE);
+                        cameraButton.cancel();
                         getSupportFragmentManager().beginTransaction().detach(cameraFragment).commit();
                     }
                 } else if (verticalOffset == 0 && content.getVisibility() == View.GONE) {
@@ -254,7 +257,7 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
         btnGroup.startAnimation(translateAnimation);
     }
 
-    @OnClick({R.id.crop, R.id.sure})
+    @OnClick({R.id.crop, R.id.sure , R.id.action_btn})
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -265,6 +268,9 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
                 finish();
                 break;
             case R.id.sure:
+                break;
+            case R.id.action_btn:
+                recyclerView.smoothScrollToPosition(0);
                 break;
         }
     }

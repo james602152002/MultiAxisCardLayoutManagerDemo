@@ -150,4 +150,17 @@
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
 
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/action_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="30dp"
+        android:layout_marginRight="30dp"
+        android:clickable="true"
+        android:elevation="30dp"
+        android:src="@drawable/ic_arrow_upward_white_24dp"
+        app:layout_behavior="@string/scroll_to_top_behavior"
+        app:rippleColor="#80FFFFFF" />
+
+
 </android.support.design.widget.CoordinatorLayout>

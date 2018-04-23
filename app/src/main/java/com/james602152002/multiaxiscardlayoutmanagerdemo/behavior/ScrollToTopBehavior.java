@@ -10,6 +10,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -32,7 +33,7 @@ public class ScrollToTopBehavior extends CoordinatorLayout.Behavior<FloatingActi
     @Override
     public boolean onStartNestedScroll(@NonNull CoordinatorLayout coordinatorLayout, @NonNull FloatingActionButton child, @NonNull View directTargetChild, @NonNull View target, int axes, int type) {
         actionButton = child;
-        if (target instanceof SmartRefreshLayout) {
+        if (target instanceof SmartRefreshLayout || target instanceof RecyclerView) {
             return (axes & ViewCompat.SCROLL_AXIS_VERTICAL) != 0;
         }
         return super.onStartNestedScroll(coordinatorLayout, child, directTargetChild, target, axes, type);
@@ -42,19 +43,22 @@ public class ScrollToTopBehavior extends CoordinatorLayout.Behavior<FloatingActi
     public void onNestedPreScroll(@NonNull CoordinatorLayout coordinatorLayout, @NonNull FloatingActionButton child, @NonNull View target, int dx, int dy, @NonNull int[] consumed, int type) {
         if (target instanceof SmartRefreshLayout) {
             final RecyclerView recyclerView = (RecyclerView) ((SmartRefreshLayout) target).getChildAt(0);
-            initListener(recyclerView);
-            if (dy < 0 && recyclerView.canScrollVertically(-1)) {
-                toggleFloatingBtn(child, true, dy);
-            } else if (dy > 0 && recyclerView.canScrollVertically(1)) {
-                toggleFloatingBtn(child, false, dy);
-            } else if (dy < 0 && !recyclerView.canScrollVertically(-1)) {
-                toggleFloatingBtn(child, false, dy);
-            }
+            initListener(recyclerView,child,dy);
+//            if (dy < 0 && recyclerView.canScrollVertically(-1)) {
+//                toggleFloatingBtn(child, true, dy);
+//            } else if (dy > 0 && recyclerView.canScrollVertically(1)) {
+//                toggleFloatingBtn(child, false, dy);
+//            } else if (dy < 0 && !recyclerView.canScrollVertically(-1)) {
+//                toggleFloatingBtn(child, false, dy);
+//            }
+        } else if (target instanceof RecyclerView) {
+            final RecyclerView recyclerView = (RecyclerView)target;
+            initListener(recyclerView,child,dy);
         }
         super.onNestedPreScroll(coordinatorLayout, child, target, dx, dy, consumed, type);
     }
 
-    private void initListener(RecyclerView recyclerView) {
+    private void initListener(RecyclerView recyclerView, FloatingActionButton child, int dy) {
         if (listener == null) {
             recyclerView.setOnTouchListener(this);
             listener = new RecyclerView.OnScrollListener() {
@@ -70,6 +74,13 @@ public class ScrollToTopBehavior extends CoordinatorLayout.Behavior<FloatingActi
                 }
             };
             recyclerView.addOnScrollListener(listener);
+        }
+        if (dy < 0 && recyclerView.canScrollVertically(-1)) {
+            toggleFloatingBtn(child, true, dy);
+        } else if (dy > 0 && recyclerView.canScrollVertically(1)) {
+            toggleFloatingBtn(child, false, dy);
+        } else if (dy < 0 && !recyclerView.canScrollVertically(-1)) {
+            toggleFloatingBtn(child, false, dy);
         }
     }
 
@@ -111,6 +122,7 @@ public class ScrollToTopBehavior extends CoordinatorLayout.Behavior<FloatingActi
         child.setClickable(true);
         final float width = parent_height - dest_y;
         float ratio = 1 - ((child.getTranslationY() + dy - dest_y) / width);
+        Log.i("", "ratio ============== " + ratio);
         if (ratio > 1)
             ratio = 1;
         if (ratio < 0)

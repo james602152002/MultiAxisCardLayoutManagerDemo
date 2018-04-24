@@ -7,6 +7,7 @@ import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.transition.ChangeBounds;
+import android.util.TypedValue;
 import android.view.Window;
 import android.widget.FrameLayout;
 
@@ -70,5 +71,14 @@ public class ActivityTranslucent extends AppCompatActivity {
             result = getResources().getDimensionPixelSize(resourceId);
         }
         return result;
+    }
+
+    protected final int getToolBarHeight() {
+        int actionBarHeight = 0;
+        TypedValue tv = new TypedValue();
+        if (getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
+            actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data, getResources().getDisplayMetrics());
+        }
+        return actionBarHeight;
     }
 }

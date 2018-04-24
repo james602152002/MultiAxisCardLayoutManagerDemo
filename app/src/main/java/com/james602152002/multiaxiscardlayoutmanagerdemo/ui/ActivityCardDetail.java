@@ -24,6 +24,7 @@ import com.james602152002.multiaxiscardlayoutmanagerdemo.recyclerview.item_touch
 import com.james602152002.multiaxiscardlayoutmanagerdemo.recyclerview.item_touch_helper.ItemMoveAdapter;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.util.DiffListCallBackUtil;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.util.IPhone6ScreenResizeUtil;
+import com.james602152002.multiaxiscardlayoutmanagerdemo.util.SmoothScrollUtil;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.listener.OnLoadMoreListener;
@@ -234,7 +235,7 @@ public class ActivityCardDetail extends ActivityTranslucent {
 
     @OnClick(R.id.action_btn)
     protected void clickActionButton() {
-        recyclerView.smoothScrollToPosition(0);
+        SmoothScrollUtil.smoothScrollToTop(recyclerView);
     }
 
     public SimpleDraweeView getImage() {

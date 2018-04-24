@@ -1,14 +1,15 @@
 package com.james602152002.multiaxiscardlayoutmanagerdemo.ui;
 
-import android.Manifest;
 import android.content.ContentResolver;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
@@ -16,19 +17,15 @@ import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.AppCompatImageButton;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
 import android.view.View;
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.facebook.drawee.view.SimpleDraweeView;
-import com.github.florent37.camerafragment.CameraFragment;
-import com.github.florent37.camerafragment.configuration.Configuration;
-import com.github.florent37.camerafragment.listeners.CameraFragmentResultListener;
 import com.hluhovskyi.camerabutton.CameraButton;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.R;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.adapter.CameraGalleryAdapter;
@@ -36,9 +33,17 @@ import com.james602152002.multiaxiscardlayoutmanagerdemo.fragment.CameraCropFrag
 import com.james602152002.multiaxiscardlayoutmanagerdemo.interfaces.CameraCropListener;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.recyclerview.item_decoration.CameraGalleryDecoration;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.util.IPhone6ScreenResizeUtil;
+import com.james602152002.multiaxiscardlayoutmanagerdemo.util.SmoothScrollUtil;
+import com.wonderkiln.camerakit.CameraKit;
+import com.wonderkiln.camerakit.CameraKitError;
+import com.wonderkiln.camerakit.CameraKitEvent;
+import com.wonderkiln.camerakit.CameraKitEventListener;
+import com.wonderkiln.camerakit.CameraKitImage;
+import com.wonderkiln.camerakit.CameraKitVideo;
+import com.wonderkiln.camerakit.CameraView;
 
 import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -54,17 +59,16 @@ import io.reactivex.schedulers.Schedulers;
 
 public class ActivityCamera extends ActivityTranslucent implements View.OnClickListener {
 
-    private CameraFragment cameraFragment;
+    @BindView(R.id.img_camera_rotate)
+    AppCompatImageButton imgCameraRotate;
     @BindView(R.id.appbar)
     AppBarLayout appBarLayout;
     @BindView(R.id.camera_header)
     View cameraHeader;
-    @BindView(R.id.photo)
-    SimpleDraweeView photo;
     @BindView(R.id.camera_btn)
     CameraButton cameraButton;
     @BindView(R.id.content)
-    FrameLayout content;
+    CameraView cameraView;
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
     @BindView(R.id.recycler_view)
@@ -78,13 +82,6 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
         ButterKnife.bind(this);
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-                == PackageManager.PERMISSION_GRANTED) {
-            cameraFragment = CameraFragment.newInstance(new Configuration.Builder().build());
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.content, cameraFragment, null)
-                    .commit();
-        }
 
         initToolBar();
         initView();
@@ -96,8 +93,6 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
         mCToolbarLayout.setExpandedTitleColor(0);
         // Set the support action bar
         initToolBar(mToolbar);
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP)
-            ((FrameLayout.LayoutParams) mToolbar.getLayoutParams()).topMargin = getStatusBarHeight();
 
         LinearLayout view = new LinearLayout(this);
         view.setGravity(Gravity.CENTER_VERTICAL);
@@ -122,18 +117,18 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
                 int color = ContextCompat.getColor(appBarLayout.getContext(), R.color.colorPrimary);
                 color = color & alpha;
                 appBarLayout.setBackgroundColor(color);
-                content.setAlpha(dy / total_scroll_range);
+                cameraView.setAlpha(dy / total_scroll_range);
+                cameraButton.cancel();
                 if (dy == 0) {
-                    if (content.getVisibility() == View.VISIBLE) {
-                        content.setVisibility(View.GONE);
+                    if (cameraView.getVisibility() == View.VISIBLE) {
+                        cameraView.setVisibility(View.GONE);
+                        cameraView.stop();
                         cameraButton.setVisibility(View.GONE);
-                        cameraButton.cancel();
-                        getSupportFragmentManager().beginTransaction().detach(cameraFragment).commit();
                     }
-                } else if (verticalOffset == 0 && content.getVisibility() == View.GONE) {
-                    content.setVisibility(View.VISIBLE);
+                } else if (verticalOffset == 0 && cameraView.getVisibility() == View.GONE) {
+                    cameraView.setVisibility(View.VISIBLE);
+                    cameraView.start();
                     cameraButton.setVisibility(View.VISIBLE);
-                    getSupportFragmentManager().beginTransaction().attach(cameraFragment).commit();
                 }
             }
         });
@@ -141,69 +136,142 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
 
 
     private void initView() {
+        initCameraView();
+        initRecyclerView();
+    }
+
+    private void initCameraView() {
         CollapsingToolbarLayout.LayoutParams cameraHeaderParams = (CollapsingToolbarLayout.LayoutParams) cameraHeader.getLayoutParams();
         cameraHeaderParams.width = IPhone6ScreenResizeUtil.getCurrentScreenWidth();
         cameraHeaderParams.height = IPhone6ScreenResizeUtil.getCurrentScreenHeight();
 
-        ConstraintLayout.LayoutParams photoParams = (ConstraintLayout.LayoutParams) photo.getLayoutParams();
-        photoParams.width = IPhone6ScreenResizeUtil.getCurrentScreenWidth();
-        photoParams.height = IPhone6ScreenResizeUtil.getCurrentScreenHeight();
+        cameraView.setMethod(CameraKit.Constants.METHOD_STILL);
+        cameraView.addCameraKitListener(new CameraKitEventListener() {
+            @Override
+            public void onEvent(CameraKitEvent cameraKitEvent) {
 
+            }
+
+            @Override
+            public void onError(CameraKitError cameraKitError) {
+
+            }
+
+            @Override
+            public void onImage(final CameraKitImage cameraKitImage) {
+//                cameraButton.setVisibility(View.GONE);
+                cameraView.stop();
+                final CompositeDisposable compositeDisposable = new CompositeDisposable();
+                Observable<Uri> observable = Observable.create(new ObservableOnSubscribe<Uri>() {
+                    @Override
+                    public void subscribe(ObservableEmitter<Uri> emitter) throws Exception {
+                        FileOutputStream stream = null;
+                        Bitmap bitmap = cameraKitImage.getBitmap();
+                        File file = new File(Environment.getExternalStorageDirectory(), System.currentTimeMillis() + ".jpeg");
+                        stream = new FileOutputStream(file);
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+                        Uri uri = Uri.fromFile(file);
+                        MediaStore.Images.Media.insertImage(getContentResolver(), file.getAbsolutePath(), file.getName(), "crop_photos");
+                        stream.flush(); // Not really required
+                        stream.close();
+                        emitter.onNext(uri);
+                        emitter.onComplete();
+                    }
+                });
+
+                observable.subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Observer<Uri>() {
+                            @Override
+                            public void onSubscribe(Disposable d) {
+                                compositeDisposable.add(d);
+                            }
+
+                            @Override
+                            public void onNext(Uri uri) {
+                                cameraView.setTag(uri);
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+                                compositeDisposable.dispose();
+                                compositeDisposable.clear();
+                            }
+
+                            @Override
+                            public void onComplete() {
+                                showPhoto();
+                            }
+                        });
+            }
+
+            @Override
+            public void onVideo(CameraKitVideo cameraKitVideo) {
+                usingCamera = true;
+                sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(cameraKitVideo.getVideoFile())));
+            }
+        });
         cameraButton.setOnPhotoEventListener(new CameraButton.OnPhotoEventListener() {
             @Override
             public void onClick() {
-                cameraFragment.takePhotoOrCaptureVideo(new CameraFragmentResultListener() {
-                    @Override
-                    public void onVideoRecorded(String filePath) {
-                        usingCamera = true;
-                    }
-
-                    @Override
-                    public void onPhotoTaken(byte[] bytes, String filePath) {
-                        usingCamera = true;
-                        content.setVisibility(View.GONE);
-                        cameraButton.setVisibility(View.GONE);
-                        getSupportFragmentManager().beginTransaction().detach(cameraFragment).commit();
-                        File file = new File(filePath);
-                        Uri uri = Uri.fromFile(file);
-                        try {
-                            MediaStore.Images.Media.insertImage(getContentResolver(), filePath, file.getName(), "crop_photos");
-                        } catch (FileNotFoundException exception) {
-
-                        }
-                        photo.setImageURI(uri);
-                        photo.setTag(uri);
-                        showPhoto();
-                    }
-                }, null, null);
+                usingCamera = true;
+                cameraView.captureImage();
             }
         });
 
-        cameraButton.setProgressArcColors(new int[]{ContextCompat.getColor(this, R.color.colorPrimary), Color.BLUE});
+        cameraButton.setOnVideoEventListener(new CameraButton.OnVideoEventListener() {
+            @Override
+            public void onStart() {
+                cameraView.captureVideo();
+            }
 
-        final CompositeDisposable disposable = new CompositeDisposable();
+            @Override
+            public void onFinish() {
+                cameraView.stopVideo();
+            }
+
+            @Override
+            public void onCancel() {
+                cameraView.stopVideo();
+            }
+        });
+
+
+        imgCameraRotate.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN);
+        final int tool_bar_height = getToolBarHeight();
+        final int status_bar_height = getStatusBarHeight();
+        final int img_width = IPhone6ScreenResizeUtil.getPxValue(40);
+        final int img_margin = (tool_bar_height - img_width) >> 1;
+        ConstraintLayout.LayoutParams camera_rotate_params = (ConstraintLayout.LayoutParams) imgCameraRotate.getLayoutParams();
+        camera_rotate_params.height = img_width + (img_margin << 1);
+        camera_rotate_params.width = img_width + (img_margin << 1);
+        camera_rotate_params.setMargins(IPhone6ScreenResizeUtil.getPxValue(30),
+                (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP ? status_bar_height : 0),
+                IPhone6ScreenResizeUtil.getPxValue(10), 0);
+        imgCameraRotate.setPadding(img_margin, img_margin, img_margin, img_margin);
+
+        cameraButton.setProgressArcColors(new int[]{ContextCompat.getColor(this, R.color.colorPrimary), Color.BLUE});
+    }
+
+    private void initRecyclerView() {
+        final CompositeDisposable compositeDisposable = new CompositeDisposable();
         Observable<Cursor> observable = Observable.create(new ObservableOnSubscribe<Cursor>() {
             @Override
             public void subscribe(ObservableEmitter<Cursor> emitter) {
-                try {
-                    Uri mImageUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-                    ContentResolver mContentResolver = getContentResolver();
+                Uri mImageUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+                ContentResolver mContentResolver = getContentResolver();
 
-                    String[] projection = new String[]{MediaStore.Images.Media.MIME_TYPE,
-                            MediaStore.Images.Media.DATE_MODIFIED, MediaStore.Images.Media.DATA};
-                    // 只查询jpeg和png的图片
-                    Cursor mCursor = mContentResolver.query(mImageUri, projection,
-                            MediaStore.Images.Media.MIME_TYPE + "=? or " + MediaStore.Images.Media.MIME_TYPE + "=?",
-                            new String[]{"image/jpeg", "image/png"}, MediaStore.Images.Media.DATE_ADDED + " DESC");
+                String[] projection = new String[]{MediaStore.Images.Media.MIME_TYPE,
+                        MediaStore.Images.Media.DATE_MODIFIED, MediaStore.Images.Media.DATA};
+                // 只查询jpeg和png的图片
+                Cursor mCursor = mContentResolver.query(mImageUri, projection,
+                        MediaStore.Images.Media.MIME_TYPE + "=? or " + MediaStore.Images.Media.MIME_TYPE + "=?",
+                        new String[]{"image/jpeg", "image/png"}, MediaStore.Images.Media.DATE_ADDED + " DESC");
 //                    MediaStore.Images.Media.DATE_ADDED + " DESC"
-                    if (mCursor != null) {
-                        emitter.onNext(mCursor);
-                        emitter.onComplete();
-                    } else {
-                        emitter.onError(new Throwable());
-                    }
-                } catch (Exception e) {
-
+                if (mCursor != null) {
+                    emitter.onNext(mCursor);
+                    emitter.onComplete();
+                } else {
+                    emitter.onError(new Throwable());
                 }
             }
         });
@@ -214,7 +282,7 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
                 .subscribe(new Observer<Cursor>() {
                     @Override
                     public void onSubscribe(Disposable d) {
-                        disposable.add(d);
+                        compositeDisposable.add(d);
                     }
 
                     @Override
@@ -225,14 +293,14 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
 
                     @Override
                     public void onError(Throwable e) {
-                        disposable.dispose();
-                        disposable.clear();
+                        compositeDisposable.dispose();
+                        compositeDisposable.clear();
                     }
 
                     @Override
                     public void onComplete() {
-                        disposable.dispose();
-                        disposable.clear();
+                        compositeDisposable.dispose();
+                        compositeDisposable.clear();
                     }
                 });
     }
@@ -244,7 +312,7 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
             public void onCrop() {
                 Intent uriIntent = new Intent();
                 uriIntent.putExtra("type", "crop");
-                uriIntent.putExtra("uri", (Uri) photo.getTag());
+                uriIntent.putExtra("uri", (Uri) cameraView.getTag());
                 setResult(RESULT_OK, uriIntent);
                 onBackPressed();
             }
@@ -252,9 +320,9 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
             @Override
             public void onSend() {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-                    photo.setTransitionName("avatar");
+                    cameraView.setTransitionName("avatar");
                 Intent uriIntent = new Intent();
-                uriIntent.putExtra("uri", (Uri) photo.getTag());
+                uriIntent.putExtra("uri", (Uri) cameraView.getTag());
                 uriIntent.putExtra("type", "send");
                 setResult(RESULT_OK, uriIntent);
                 onBackPressed();
@@ -262,24 +330,43 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
 
             @Override
             public void onDismiss() {
-                if (content.getVisibility() == View.GONE) {
-                    content.setVisibility(View.VISIBLE);
-                    cameraButton.setVisibility(View.VISIBLE);
-                    getSupportFragmentManager().beginTransaction().attach(cameraFragment).commit();
-                    usingCamera = false;
-                }
+                cameraView.start();
+                cameraButton.setVisibility(View.VISIBLE);
+                usingCamera = false;
             }
         });
         dialogFragment.show(getSupportFragmentManager(), "show_crop_dialog");
     }
 
-    @OnClick({R.id.action_btn})
+    @OnClick({R.id.img_camera_rotate, R.id.action_btn})
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
+            case R.id.img_camera_rotate:
+                switch (cameraView.getFacing()) {
+                    case CameraKit.Constants.FACING_BACK:
+                        cameraView.setFacing(CameraKit.Constants.FACING_FRONT);
+                        break;
+                    case CameraKit.Constants.FACING_FRONT:
+                        cameraView.setFacing(CameraKit.Constants.FACING_BACK);
+                        break;
+                }
+                break;
             case R.id.action_btn:
-                recyclerView.smoothScrollToPosition(0);
+                SmoothScrollUtil.smoothScrollToTop(recyclerView);
                 break;
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        cameraView.start();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        cameraView.stop();
     }
 }

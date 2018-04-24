@@ -57,12 +57,12 @@ dependencies {
     implementation 'com.yanzhenjie:permission:2.0.0-rc2'
 
     implementation 'com.jaredrummler:animated-svg-view:1.0.5'
-    implementation 'com.github.florent37:camerafragment:1.0.9'
+//    implementation 'com.github.florent37:camerafragment:1.0.9'
 
     implementation "com.hluhovskyi.camerabutton:camerabutton:${cameraBtnLibVersion}"
     implementation "com.hluhovskyi.camerabutton:camerabutton-rxjava2:${cameraBtnLibVersion}"
     implementation "com.hluhovskyi.camerabutton:camerabutton-rxjava2-kotlin:${cameraBtnLibVersion}"
 
     implementation 'com.facebook.fresco:fresco:1.8.1'
-//    implementation 'com.github.CarGuo:FrescoUtils:v1.2.1'
+    implementation 'com.wonderkiln:camerakit:0.13.1'
 }

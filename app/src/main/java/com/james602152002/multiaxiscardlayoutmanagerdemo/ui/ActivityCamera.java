@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
@@ -145,6 +146,13 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
         cameraHeaderParams.width = IPhone6ScreenResizeUtil.getCurrentScreenWidth();
         cameraHeaderParams.height = IPhone6ScreenResizeUtil.getCurrentScreenHeight();
 
+        cameraButton.setVisibility(View.GONE);
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                cameraButton.setVisibility(View.VISIBLE);
+            }
+        }, 2000);
         cameraView.setMethod(CameraKit.Constants.METHOD_STILL);
         cameraView.addCameraKitListener(new CameraKitEventListener() {
             @Override
@@ -206,8 +214,8 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
 
             @Override
             public void onVideo(CameraKitVideo cameraKitVideo) {
-                usingCamera = true;
-                sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(cameraKitVideo.getVideoFile())));
+//                usingCamera = true;
+//                sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(cameraKitVideo.getVideoFile())));
             }
         });
         cameraButton.setOnPhotoEventListener(new CameraButton.OnPhotoEventListener() {
@@ -218,22 +226,22 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
             }
         });
 
-        cameraButton.setOnVideoEventListener(new CameraButton.OnVideoEventListener() {
-            @Override
-            public void onStart() {
-                cameraView.captureVideo();
-            }
-
-            @Override
-            public void onFinish() {
-                cameraView.stopVideo();
-            }
-
-            @Override
-            public void onCancel() {
-                cameraView.stopVideo();
-            }
-        });
+//        cameraButton.setOnVideoEventListener(new CameraButton.OnVideoEventListener() {
+//            @Override
+//            public void onStart() {
+//                cameraView.captureVideo();
+//            }
+//
+//            @Override
+//            public void onFinish() {
+//                cameraView.stopVideo();
+//            }
+//
+//            @Override
+//            public void onCancel() {
+//                cameraView.stopVideo();
+//            }
+//        });
 
 
         imgCameraRotate.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN);

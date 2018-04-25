@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.AppBarLayout;
@@ -203,39 +204,44 @@ public class ActivityPersonalCenter extends ActivityTranslucent implements View.
                 break;
             case R.id.camera_btn:
             case R.id.take_pic:
-                AndPermission.with(this).permission(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE).onGranted(new Action() {
+                AndPermission.with(this).permission(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.RECORD_AUDIO).onGranted(new Action() {
                     @Override
                     public void onAction(List<String> permissions) {
-                        Intent destIntent = new Intent(ActivityPersonalCenter.this, ActivityCamera.class);
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                            setExitSharedElementCallback(new SharedElementCallback() {
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                Intent destIntent = new Intent(ActivityPersonalCenter.this, ActivityCamera.class);
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                    setExitSharedElementCallback(new SharedElementCallback() {
 
-                                @Override
-                                public void onSharedElementEnd(List<String> sharedElementNames,
-                                                               List<View> sharedElements,
-                                                               List<View> sharedElementSnapshots) {
+                                        @Override
+                                        public void onSharedElementEnd(List<String> sharedElementNames,
+                                                                       List<View> sharedElements,
+                                                                       List<View> sharedElementSnapshots) {
 
-                                    super.onSharedElementEnd(sharedElementNames, sharedElements,
-                                            sharedElementSnapshots);
+                                            super.onSharedElementEnd(sharedElementNames, sharedElements,
+                                                    sharedElementSnapshots);
 
-                                    for (final View view : sharedElements) {
-                                        if (view == avatar) {
-                                            view.setVisibility(View.VISIBLE);
+                                            for (final View view : sharedElements) {
+                                                if (view == avatar) {
+                                                    view.setVisibility(View.VISIBLE);
+                                                }
+                                            }
                                         }
-                                    }
+                                    });
+                                    Window window = getWindow();
+                                    window.setSharedElementEnterTransition(DraweeTransition.createTransitionSet(
+                                            ScalingUtils.ScaleType.CENTER_CROP, ScalingUtils.ScaleType.CENTER_CROP));
+                                    window.setSharedElementExitTransition(DraweeTransition.createTransitionSet(
+                                            ScalingUtils.ScaleType.CENTER_CROP, ScalingUtils.ScaleType.CENTER_CROP));
+                                    ActivityCompat.startActivityForResult(ActivityPersonalCenter.this, destIntent,
+                                            100, ActivityOptions.makeSceneTransitionAnimation(ActivityPersonalCenter.this, avatar, "avatar").toBundle());
+                                    avatar.setImageURI("");
+                                } else {
+                                    startActivityForResult(destIntent, 100);
                                 }
-                            });
-                            Window window = getWindow();
-                            window.setSharedElementEnterTransition(DraweeTransition.createTransitionSet(
-                                    ScalingUtils.ScaleType.CENTER_CROP, ScalingUtils.ScaleType.CENTER_CROP));
-                            window.setSharedElementExitTransition(DraweeTransition.createTransitionSet(
-                                    ScalingUtils.ScaleType.CENTER_CROP, ScalingUtils.ScaleType.CENTER_CROP));
-                            ActivityCompat.startActivityForResult(ActivityPersonalCenter.this, destIntent,
-                                    100, ActivityOptions.makeSceneTransitionAnimation(ActivityPersonalCenter.this, avatar, "avatar").toBundle());
-                            avatar.setImageURI("");
-                        } else {
-                            startActivityForResult(destIntent, 100);
-                        }
+                            }
+                        }, Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP ? 100 : 0);
                     }
                 }).start();
                 break;

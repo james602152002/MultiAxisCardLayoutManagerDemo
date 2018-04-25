@@ -49,6 +49,7 @@
                     android:layout_height="@dimen/cb_layout_height_default"
                     android:layout_marginBottom="20dp"
                     android:elevation="15dp"
+                    app:cb_mode="photo"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent" />

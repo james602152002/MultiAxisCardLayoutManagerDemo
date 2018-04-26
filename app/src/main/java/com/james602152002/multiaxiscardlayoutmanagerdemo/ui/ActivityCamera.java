@@ -73,6 +73,8 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
     CameraButton cameraButton;
     @BindView(R.id.camera_view)
     CameraView cameraView;
+    @BindView(R.id.camera_bottom_sheet)
+    ConstraintLayout cameraBottomSheet;
     @BindView(R.id.photo_taken)
     SimpleDraweeView photoTaken;
     @BindView(R.id.toolbar)
@@ -82,6 +84,7 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
     @BindView(R.id.action_btn)
     FloatingActionButton floatingActionButton;
     private boolean usingCamera = false;
+    private ScaleAnimation photoTakeAnim;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -153,10 +156,9 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
 
         final int tool_bar_height = getToolBarHeight();
         final int status_bar_height = getStatusBarHeight();
-        ConstraintLayout.LayoutParams cameraViewParams = (ConstraintLayout.LayoutParams) cameraView.getLayoutParams();
-        cameraViewParams.setMargins(0,
-                tool_bar_height + (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP ? status_bar_height : 0),
-                0, tool_bar_height + status_bar_height);
+        final int camera_btn_width = tool_bar_height + status_bar_height;
+
+        ((ConstraintLayout.LayoutParams) cameraBottomSheet.getLayoutParams()).height = camera_btn_width;
 
         cameraButton.setVisibility(View.GONE);
         new Handler().postDelayed(new Runnable() {
@@ -208,13 +210,11 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
 
                             @Override
                             public void onNext(Uri uri) {
-                                refreshAdapter();
                                 cameraView.setTag(uri);
-                                if (photoTaken.getAnimation() == null) {
-                                    ScaleAnimation anim = new ScaleAnimation(1.5f, 1, 1.5f, 1, Animation.RELATIVE_TO_SELF, 1, Animation.RELATIVE_TO_SELF, 1);
-                                    anim.setDuration(500);
-                                    photoTaken.setAnimation(anim);
-                                    anim.start();
+                                if (photoTakeAnim == null) {
+                                    photoTakeAnim = new ScaleAnimation(1.5f, 1, 1.5f, 1, Animation.RELATIVE_TO_SELF, 1, Animation.RELATIVE_TO_SELF, 1);
+                                    photoTakeAnim.setDuration(500);
+                                    photoTaken.startAnimation(photoTakeAnim);
                                 }
                                 photoTaken.setImageURI(uri);
                             }
@@ -275,18 +275,70 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
                 IPhone6ScreenResizeUtil.getPxValue(10), 0);
         imgCameraRotate.setPadding(img_margin, img_margin, img_margin, img_margin);
 
-        final int photo_taken_width = IPhone6ScreenResizeUtil.getPxValue(80);
+
+        final int photo_taken_width = (int) (camera_btn_width * .618f);
         ConstraintLayout.LayoutParams photoTakeParams = (ConstraintLayout.LayoutParams) photoTaken.getLayoutParams();
         photoTakeParams.width = photo_taken_width;
         photoTakeParams.height = photo_taken_width;
-        photoTakeParams.setMargins(0, 0, img_margin, img_margin);
+        photoTakeParams.setMargins(0, 0, img_margin, 0);
 
         cameraButton.setProgressArcColors(new int[]{ContextCompat.getColor(this, R.color.colorPrimary), Color.BLUE});
+        ConstraintLayout.LayoutParams cameraBtnParams = (ConstraintLayout.LayoutParams) cameraButton.getLayoutParams();
+        cameraBtnParams.width = camera_btn_width;
+        cameraBtnParams.height = camera_btn_width;
+        cameraBtnParams.bottomMargin = (int) (camera_btn_width * .5f);
     }
 
     private void initRecyclerView() {
         recyclerView.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
         recyclerView.addItemDecoration(new CameraGalleryDecoration());
+        final CompositeDisposable compositeDisposable = new CompositeDisposable();
+        Observable<Cursor> observable = Observable.create(new ObservableOnSubscribe<Cursor>() {
+            @Override
+            public void subscribe(ObservableEmitter<Cursor> emitter) {
+                Uri mImageUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+                ContentResolver mContentResolver = getContentResolver();
+
+                String[] projection = new String[]{MediaStore.Images.Media.MIME_TYPE,
+                        MediaStore.Images.Media.DATE_MODIFIED, MediaStore.Images.Media.DATA};
+                // 只查询jpeg和png的图片
+                Cursor mCursor = mContentResolver.query(mImageUri, projection,
+                        MediaStore.Images.Media.MIME_TYPE + "=? or " + MediaStore.Images.Media.MIME_TYPE + "=?",
+                        new String[]{"image/jpeg", "image/png"}, MediaStore.Images.Media.DATE_ADDED + " DESC");
+//                    MediaStore.Images.Media.DATE_ADDED + " DESC"
+                if (mCursor != null) {
+                    emitter.onNext(mCursor);
+                    emitter.onComplete();
+                } else {
+                    emitter.onError(new Throwable());
+                }
+            }
+        });
+        observable.subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<Cursor>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        compositeDisposable.add(d);
+                    }
+
+                    @Override
+                    public void onNext(Cursor cursor) {
+                        CameraGalleryAdapter adapter = new CameraGalleryAdapter(ActivityCamera.this, cursor);
+                        recyclerView.setAdapter(adapter);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        compositeDisposable.dispose();
+                        compositeDisposable.clear();
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        compositeDisposable.dispose();
+                        compositeDisposable.clear();
+                    }
+                });
     }
 
     private void showPhoto() {
@@ -346,57 +398,6 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
     protected void onResume() {
         super.onResume();
         cameraView.start();
-        refreshAdapter();
-    }
-
-    private void refreshAdapter() {
-        final CompositeDisposable compositeDisposable = new CompositeDisposable();
-        Observable<Cursor> observable = Observable.create(new ObservableOnSubscribe<Cursor>() {
-            @Override
-            public void subscribe(ObservableEmitter<Cursor> emitter) {
-                Uri mImageUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-                ContentResolver mContentResolver = getContentResolver();
-
-                String[] projection = new String[]{MediaStore.Images.Media.MIME_TYPE,
-                        MediaStore.Images.Media.DATE_MODIFIED, MediaStore.Images.Media.DATA};
-                // 只查询jpeg和png的图片
-                Cursor mCursor = mContentResolver.query(mImageUri, projection,
-                        MediaStore.Images.Media.MIME_TYPE + "=? or " + MediaStore.Images.Media.MIME_TYPE + "=?",
-                        new String[]{"image/jpeg", "image/png"}, MediaStore.Images.Media.DATE_ADDED + " DESC");
-//                    MediaStore.Images.Media.DATE_ADDED + " DESC"
-                if (mCursor != null) {
-                    emitter.onNext(mCursor);
-                    emitter.onComplete();
-                } else {
-                    emitter.onError(new Throwable());
-                }
-            }
-        });
-        observable.subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<Cursor>() {
-                    @Override
-                    public void onSubscribe(Disposable d) {
-                        compositeDisposable.add(d);
-                    }
-
-                    @Override
-                    public void onNext(Cursor cursor) {
-                        CameraGalleryAdapter adapter = new CameraGalleryAdapter(ActivityCamera.this, cursor);
-                        recyclerView.setAdapter(adapter);
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        compositeDisposable.dispose();
-                        compositeDisposable.clear();
-                    }
-
-                    @Override
-                    public void onComplete() {
-                        compositeDisposable.dispose();
-                        compositeDisposable.clear();
-                    }
-                });
     }
 
     @Override

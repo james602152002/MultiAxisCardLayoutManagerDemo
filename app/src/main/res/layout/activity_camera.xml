@@ -68,8 +68,10 @@
                     android:id="@+id/camera_btn"
                     android:layout_width="0px"
                     android:layout_height="0px"
-                    android:elevation="15dp"
                     app:cb_mode="photo"
+                    app:cb_main_circle_radius="10px"
+                    app:cb_main_circle_radius_expanded="10px"
+                    app:cb_stroke_width="2px"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent" />

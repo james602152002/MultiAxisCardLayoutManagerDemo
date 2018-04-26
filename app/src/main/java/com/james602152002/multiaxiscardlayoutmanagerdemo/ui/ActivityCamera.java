@@ -150,15 +150,15 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
     }
 
     private void initCameraView() {
-        CollapsingToolbarLayout.LayoutParams cameraHeaderParams = (CollapsingToolbarLayout.LayoutParams) cameraHeader.getLayoutParams();
-        cameraHeaderParams.width = IPhone6ScreenResizeUtil.getCurrentScreenWidth();
-        cameraHeaderParams.height = IPhone6ScreenResizeUtil.getCurrentScreenHeight();
-
         final int tool_bar_height = getToolBarHeight();
         final int status_bar_height = getStatusBarHeight();
         final int camera_btn_width = tool_bar_height + status_bar_height;
 
-        ((ConstraintLayout.LayoutParams) cameraBottomSheet.getLayoutParams()).height = camera_btn_width;
+        CollapsingToolbarLayout.LayoutParams cameraHeaderParams = (CollapsingToolbarLayout.LayoutParams) cameraHeader.getLayoutParams();
+        cameraHeaderParams.width = IPhone6ScreenResizeUtil.getCurrentScreenWidth();
+        cameraHeaderParams.height = IPhone6ScreenResizeUtil.getCurrentScreenHeight() - (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP ? 0 : status_bar_height);
+
+        ((ConstraintLayout.LayoutParams) cameraBottomSheet.getLayoutParams()).height = tool_bar_height;
 
         cameraButton.setVisibility(View.GONE);
         new Handler().postDelayed(new Runnable() {
@@ -276,17 +276,22 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
         imgCameraRotate.setPadding(img_margin, img_margin, img_margin, img_margin);
 
 
-        final int photo_taken_width = (int) (camera_btn_width * .618f);
+        final int photo_taken_width = (int) (tool_bar_height * .618f);
         ConstraintLayout.LayoutParams photoTakeParams = (ConstraintLayout.LayoutParams) photoTaken.getLayoutParams();
         photoTakeParams.width = photo_taken_width;
         photoTakeParams.height = photo_taken_width;
         photoTakeParams.setMargins(0, 0, img_margin, 0);
 
         cameraButton.setProgressArcColors(new int[]{ContextCompat.getColor(this, R.color.colorPrimary), Color.BLUE});
+        cameraButton.setMainCircleRadius((int) (camera_btn_width * .4f));
+        cameraButton.setMainCircleRadiusExpanded((int) (camera_btn_width * .4f));
+        cameraButton.setStrokeWidth((int) (camera_btn_width * .1f));
+        cameraButton.setIconSize((int) (camera_btn_width * .4f));
+//        cameraButton.setIcons(new int[]{R.drawable.ic_camera_alt_black_24dp});
         ConstraintLayout.LayoutParams cameraBtnParams = (ConstraintLayout.LayoutParams) cameraButton.getLayoutParams();
         cameraBtnParams.width = camera_btn_width;
         cameraBtnParams.height = camera_btn_width;
-        cameraBtnParams.bottomMargin = (int) (camera_btn_width * .5f);
+        cameraBtnParams.bottomMargin = (int) (tool_bar_height - camera_btn_width * .5f);
     }
 
     private void initRecyclerView() {

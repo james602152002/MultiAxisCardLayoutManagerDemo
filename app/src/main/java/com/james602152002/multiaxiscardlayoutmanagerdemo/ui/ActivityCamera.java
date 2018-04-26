@@ -287,7 +287,7 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
         cameraButton.setMainCircleRadiusExpanded((int) (camera_btn_width * .4f));
         cameraButton.setStrokeWidth((int) (camera_btn_width * .1f));
         cameraButton.setIconSize((int) (camera_btn_width * .4f));
-//        cameraButton.setIcons(new int[]{R.drawable.ic_camera_alt_black_24dp});
+        cameraButton.setIcons(new int[]{R.drawable.header});
         ConstraintLayout.LayoutParams cameraBtnParams = (ConstraintLayout.LayoutParams) cameraButton.getLayoutParams();
         cameraBtnParams.width = camera_btn_width;
         cameraBtnParams.height = camera_btn_width;

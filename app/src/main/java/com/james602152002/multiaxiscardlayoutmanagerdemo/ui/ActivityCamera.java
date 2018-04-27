@@ -14,6 +14,7 @@ import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
+import android.support.constraint.ConstraintSet;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -22,10 +23,11 @@ import android.support.v7.widget.AppCompatImageButton;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
+import android.transition.AutoTransition;
+import android.transition.TransitionManager;
 import android.view.Gravity;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.ScaleAnimation;
+import android.view.animation.AnimationSet;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -52,6 +54,7 @@ import java.io.FileOutputStream;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.Unbinder;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
@@ -68,13 +71,15 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
     @BindView(R.id.appbar)
     AppBarLayout appBarLayout;
     @BindView(R.id.camera_header)
-    View cameraHeader;
+    ConstraintLayout cameraHeader;
     @BindView(R.id.camera_btn)
     CameraButton cameraButton;
     @BindView(R.id.camera_view)
     CameraView cameraView;
+    @BindView(R.id.camera_widget)
+    ConstraintLayout cameraWidget;
     @BindView(R.id.camera_bottom_sheet)
-    ConstraintLayout cameraBottomSheet;
+    View cameraBottomSheet;
     @BindView(R.id.photo_taken)
     SimpleDraweeView photoTaken;
     @BindView(R.id.toolbar)
@@ -84,13 +89,14 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
     @BindView(R.id.action_btn)
     FloatingActionButton floatingActionButton;
     private boolean usingCamera = false;
-    private ScaleAnimation photoTakeAnim;
+    private AnimationSet photoTakeAnim;
+    private Unbinder unbinder;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
-        ButterKnife.bind(this);
+        unbinder = ButterKnife.bind(this);
 
         initToolBar();
         initView();
@@ -150,16 +156,9 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
     }
 
     private void initCameraView() {
-        final int tool_bar_height = getToolBarHeight();
-        final int status_bar_height = getStatusBarHeight();
-        final int camera_btn_width = tool_bar_height + status_bar_height;
-
-        CollapsingToolbarLayout.LayoutParams cameraHeaderParams = (CollapsingToolbarLayout.LayoutParams) cameraHeader.getLayoutParams();
-        cameraHeaderParams.width = IPhone6ScreenResizeUtil.getCurrentScreenWidth();
-        cameraHeaderParams.height = IPhone6ScreenResizeUtil.getCurrentScreenHeight() - (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP ? 0 : status_bar_height);
-
-        ((ConstraintLayout.LayoutParams) cameraBottomSheet.getLayoutParams()).height = tool_bar_height;
-
+        adjustCameraViewLayout();
+        final int photo_margins = IPhone6ScreenResizeUtil.getPxValue(50);
+        (((ConstraintLayout.LayoutParams) photoTaken.getLayoutParams())).setMargins(photo_margins, photo_margins, photo_margins, photo_margins);
         cameraButton.setVisibility(View.GONE);
         new Handler().postDelayed(new Runnable() {
             @Override
@@ -196,7 +195,12 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
                         MediaStore.Images.Media.insertImage(getContentResolver(), file.getAbsolutePath(), file.getName(), "crop_photos");
                         stream.flush(); // Not really required
                         stream.close();
+                        boolean delay = false;
+                        if (cameraView.getTag() == null)
+                            delay = true;
                         emitter.onNext(uri);
+                        if (delay)
+                            Thread.sleep(1000);
                         emitter.onComplete();
                     }
                 });
@@ -210,12 +214,40 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
 
                             @Override
                             public void onNext(Uri uri) {
-                                cameraView.setTag(uri);
-                                if (photoTakeAnim == null) {
-                                    photoTakeAnim = new ScaleAnimation(1.5f, 1, 1.5f, 1, Animation.RELATIVE_TO_SELF, 1, Animation.RELATIVE_TO_SELF, 1);
-                                    photoTakeAnim.setDuration(500);
-                                    photoTaken.startAnimation(photoTakeAnim);
+                                if (cameraView.getTag() == null) {
+                                    ConstraintSet defaultConstraintSet = new ConstraintSet();
+                                    defaultConstraintSet.clone(cameraWidget);
+                                    ConstraintSet currentConstraintSet = new ConstraintSet();
+                                    currentConstraintSet.clone(ActivityCamera.this, R.layout.header_camera_constraint);
+                                    TransitionManager.beginDelayedTransition(cameraWidget, new AutoTransition().setDuration(800));
+                                    currentConstraintSet.applyTo(cameraWidget);
+                                    unbinder.unbind();
+                                    unbinder = ButterKnife.bind(ActivityCamera.this);
+                                    adjustCameraViewLayout();
+
+                                    final int tool_bar_height = getToolBarHeight();
+                                    final int img_width = IPhone6ScreenResizeUtil.getPxValue(40);
+                                    final int img_margin = (tool_bar_height - img_width) >> 1;
+                                    final int photo_taken_width = (int) (tool_bar_height * .618f);
+                                    ConstraintLayout.LayoutParams photoTakeParams = (ConstraintLayout.LayoutParams) photoTaken.getLayoutParams();
+                                    photoTakeParams.width = photo_taken_width;
+                                    photoTakeParams.height = photo_taken_width;
+                                    photoTakeParams.setMargins(img_width, img_width, img_margin, img_width);
+//                                    final short duration = 20000;
+//                                    photoTakeAnim = new AnimationSet(false);
+//                                    ScaleAnimation scaleAnimation = new ScaleAnimation(10f, 1, 10f, 1,
+//                                            Animation.RELATIVE_TO_SELF, 1, Animation.RELATIVE_TO_SELF, 1);
+//                                    scaleAnimation.setDuration(duration);
+////                                    photoTakeAnim.addAnimation(scaleAnimation);
+//                                    TranslateAnimation translateAnimation = new TranslateAnimation(Animation.ABSOLUTE, 0,
+//                                            Animation.ABSOLUTE, IPhone6ScreenResizeUtil.getCurrentScreenWidth(),
+//                                            Animation.ABSOLUTE, 0,
+//                                            Animation.ABSOLUTE, IPhone6ScreenResizeUtil.getCurrentScreenHeight());
+//                                    translateAnimation.setDuration(duration);
+//                                    photoTakeAnim.addAnimation(translateAnimation);
+//                                    photoTaken.startAnimation(photoTakeAnim);
                                 }
+                                cameraView.setTag(uri);
                                 photoTaken.setImageURI(uri);
                             }
 
@@ -263,6 +295,18 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
 //            }
 //        });
 
+    }
+
+    private void adjustCameraViewLayout() {
+        final int tool_bar_height = getToolBarHeight();
+        final int status_bar_height = getStatusBarHeight();
+        final int camera_btn_width = tool_bar_height + status_bar_height;
+
+        CollapsingToolbarLayout.LayoutParams cameraHeaderParams = (CollapsingToolbarLayout.LayoutParams) cameraHeader.getLayoutParams();
+        cameraHeaderParams.width = IPhone6ScreenResizeUtil.getCurrentScreenWidth();
+        cameraHeaderParams.height = IPhone6ScreenResizeUtil.getCurrentScreenHeight() - (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP ? 0 : status_bar_height);
+
+        ((ConstraintLayout.LayoutParams) cameraBottomSheet.getLayoutParams()).height = tool_bar_height;
 
         imgCameraRotate.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN);
         final int img_width = IPhone6ScreenResizeUtil.getPxValue(40);
@@ -274,13 +318,6 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
                 (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP ? status_bar_height : 0),
                 IPhone6ScreenResizeUtil.getPxValue(10), 0);
         imgCameraRotate.setPadding(img_margin, img_margin, img_margin, img_margin);
-
-
-        final int photo_taken_width = (int) (tool_bar_height * .618f);
-        ConstraintLayout.LayoutParams photoTakeParams = (ConstraintLayout.LayoutParams) photoTaken.getLayoutParams();
-        photoTakeParams.width = photo_taken_width;
-        photoTakeParams.height = photo_taken_width;
-        photoTakeParams.setMargins(0, 0, img_margin, 0);
 
         cameraButton.setProgressArcColors(new int[]{ContextCompat.getColor(this, R.color.colorPrimary), Color.BLUE});
         cameraButton.setMainCircleRadius((int) (camera_btn_width * .4f));
@@ -361,7 +398,7 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
             @Override
             public void onSend() {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-                    cameraView.setTransitionName("avatar");
+                    photoTaken.setTransitionName("avatar");
                 Intent uriIntent = new Intent();
                 uriIntent.putExtra("uri", (Uri) cameraView.getTag());
                 uriIntent.putExtra("type", "send");

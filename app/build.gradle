@@ -19,6 +19,11 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    externalNativeBuild {
+        cmake {
+            path 'CMakeLists.txt'
+        }
+    }
 }
 
 ext {
@@ -65,4 +70,5 @@ dependencies {
 
     implementation 'com.facebook.fresco:fresco:1.8.1'
     implementation 'com.wonderkiln:camerakit:0.13.1'
+    implementation 'com.cv4j:rxcv4j:0.1.1.1'
 }

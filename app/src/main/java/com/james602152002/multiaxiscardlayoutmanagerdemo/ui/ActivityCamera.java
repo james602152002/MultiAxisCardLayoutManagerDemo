@@ -31,8 +31,7 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.cv4j.core.filters.face.BeautySkinFilter;
-import com.cv4j.rxjava.RxImageData;
+import com.amnix.skinsmoothness.AmniXSkinSmooth;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.hluhovskyi.camerabutton.CameraButton;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.R;
@@ -441,12 +440,18 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
                 if (cameraView.getTag() != null) {
                     final Uri uri = (Uri) cameraView.getTag();
                     originalPhoto.setImageURI(uri);
+                    AmniXSkinSmooth skinSmooth = AmniXSkinSmooth.getInstance();
                     try {
                         Bitmap bitmap = new SoftReference<>(MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri)).get();
-                        RxImageData.bitmap(bitmap).addFilter(new BeautySkinFilter()).into(filterPhoto);
+                        skinSmooth.storeBitmap(bitmap, false);
+                        skinSmooth.initSdk();
+                        skinSmooth.startSkinSmoothness(100);
+                        filterPhoto.setImageBitmap(skinSmooth.getBitmap());
+//                        RxImageData.bitmap(bitmap).addFilter(new BeautySkinFilter()).into(filterPhoto);
                     } catch (IOException e) {
 
                     }
+                    skinSmooth.unInitSdk();
                 }
                 break;
         }

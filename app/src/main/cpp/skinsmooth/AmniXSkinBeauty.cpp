@@ -1,7 +1,9 @@
+#include <android/log.h>
+#include <cstring>
 #include "AmniXSkinBeauty.h"
 #include "math.h"
-#include "bitmap/BitmapOperation.h"
-#include "bitmap/Conversion.h"
+#include "../bitmap/Conversion.h"
+#include "../bitmap/BitmapOperation.h"
 
 #define  LOG_TAG    "AmniX"
 #define  LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG,LOG_TAG,__VA_ARGS__)

@@ -1,7 +1,7 @@
 #ifndef _MAGIC_BEAUTY_H_
 #define _MAGIC_BEAUTY_H_
 
-#include "bitmap/JniBitmap.h"
+#include "../bitmap/JniBitmap.h"
 
 class AmniXSkinBeauty {
 public:

@@ -1,8 +1,9 @@
 #include <jni.h>
 #include <android/log.h>
 #include <stdio.h>
-#include "bitmap/BitmapOperation.h"
 #include "skinsmooth/AmniXSkinBeauty.h"
+#include "bitmap/JniBitmap.h"
+#include "bitmap/BitmapOperation.h"
 
 #define  LOG_TAG    "Aman"
 #define  LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG,LOG_TAG,__VA_ARGS__)
@@ -31,7 +32,7 @@ JNIEXPORT void JNICALL
 Java_com_amnix_skinsmoothness_AmniXSkinSmooth_jniStartFullBeauty(JNIEnv *env, jobject instance,
                                                                  jfloat skinSmoothLevel,
                                                                  jfloat whitenessLevel) {
-    AmniXSkinBeauty::getInstance()->_startBeauty(skinSmoothLevel,whitenessLevel);
+    AmniXSkinBeauty::getInstance()->_startBeauty(skinSmoothLevel, whitenessLevel);
 }
 
 JNIEXPORT void JNICALL Java_com_amnix_skinsmoothness_AmniXSkinSmooth_jniStartSkinSmooth(
@@ -56,7 +57,8 @@ JNIEXPORT void JNICALL Java_com_amnix_skinsmoothness_AmniXSkinSmooth_jniFreeBitm
 }
 
 /**restore java bitmap (from JNI data)*/ //
-JNIEXPORT jobject JNICALL Java_com_amnix_skinsmoothness_AmniXSkinSmooth_jniGetBitmapFromStoredBitmapData(
+JNIEXPORT jobject JNICALL
+Java_com_amnix_skinsmoothness_AmniXSkinSmooth_jniGetBitmapFromStoredBitmapData(
         JNIEnv *env, jobject obj, jobject handle) {
     return BitmapOperation::jniGetBitmapFromStoredBitmapData(env, obj, handle);
 }

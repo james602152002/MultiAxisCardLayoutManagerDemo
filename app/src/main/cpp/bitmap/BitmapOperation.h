@@ -7,7 +7,6 @@
 #include <android/bitmap.h>
 #include <cstring>
 #include <unistd.h>
-#include <bitmap/JniBitmap.h>
 
 class BitmapOperation {
 public:

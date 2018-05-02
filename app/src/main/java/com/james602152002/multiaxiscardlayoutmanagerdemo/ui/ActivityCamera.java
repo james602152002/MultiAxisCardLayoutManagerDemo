@@ -38,6 +38,7 @@ import com.james602152002.multiaxiscardlayoutmanagerdemo.adapter.CameraGalleryAd
 import com.james602152002.multiaxiscardlayoutmanagerdemo.fragment.CameraCropFragmentDialog;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.interfaces.CameraCropListener;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.recyclerview.item_decoration.CameraGalleryDecoration;
+import com.james602152002.multiaxiscardlayoutmanagerdemo.service.ServiceDeleteFilterPhoto;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.util.IPhone6ScreenResizeUtil;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.util.SmoothScrollUtil;
 import com.wonderkiln.camerakit.CameraKit;
@@ -52,7 +53,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.ref.SoftReference;
-import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -465,31 +465,9 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
                         Uri filterUri = Uri.fromFile(file);
                         filterPhoto.setImageURI(filterUri);
 
-                        final CompositeDisposable disposable = new CompositeDisposable();
-                        Observable.interval(5000, TimeUnit.MILLISECONDS).observeOn(Schedulers.newThread())
-                                .subscribeOn(Schedulers.newThread()).subscribe(new Observer<Long>() {
-                            @Override
-                            public void onSubscribe(Disposable d) {
-                                disposable.add(d);
-                            }
-
-                            @Override
-                            public void onNext(Long aLong) {
-                                if (file != null && file.exists())
-                                    file.delete();
-                            }
-
-                            @Override
-                            public void onError(Throwable e) {
-
-                            }
-
-                            @Override
-                            public void onComplete() {
-                                disposable.dispose();
-                                disposable.clear();
-                            }
-                        });
+                        Intent deleteIntent = new Intent(v.getContext(),ServiceDeleteFilterPhoto.class);
+                        deleteIntent.putExtra("uri", filterUri);
+                        startService(deleteIntent);
                     } catch (IOException e) {
 
                     }

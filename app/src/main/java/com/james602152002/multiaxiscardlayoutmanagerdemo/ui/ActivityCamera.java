@@ -22,7 +22,6 @@ import android.support.transition.AutoTransition;
 import android.support.transition.TransitionManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.AppCompatImageButton;
-import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
@@ -53,6 +52,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.ref.SoftReference;
+import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -87,7 +87,7 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
     @BindView(R.id.original_photo)
     SimpleDraweeView originalPhoto;
     @BindView(R.id.filter_photo)
-    AppCompatImageView filterPhoto;
+    SimpleDraweeView filterPhoto;
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
     @BindView(R.id.recycler_view)
@@ -254,7 +254,8 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
 
                             @Override
                             public void onComplete() {
-                                showPhoto();
+                                if (!isDestroyed())
+                                    showPhoto();
                             }
                         });
             }
@@ -438,16 +439,56 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
                 break;
             case R.id.img_camera_filter:
                 if (cameraView.getTag() != null) {
+//                    Resources resources = getResources();
+//                    Uri uri = new Uri.Builder()
+//                            .scheme(ContentResolver.SCHEME_ANDROID_RESOURCE)
+//                            .authority(resources.getResourcePackageName(R.drawable.sample1))
+//                            .appendPath(resources.getResourceTypeName(R.drawable.sample1))
+//                            .appendPath(resources.getResourceEntryName(R.drawable.sample1))
+//                            .build();
+
                     final Uri uri = (Uri) cameraView.getTag();
                     originalPhoto.setImageURI(uri);
                     AmniXSkinSmooth skinSmooth = AmniXSkinSmooth.getInstance();
                     try {
                         Bitmap bitmap = new SoftReference<>(MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri)).get();
-                        skinSmooth.storeBitmap(bitmap, false);
+//                        Bitmap bitmap = BitmapFactory.decodeResource(resources, R.drawable.sample1);
+                        skinSmooth.storeBitmap(bitmap, true);
                         skinSmooth.initSdk();
-                        skinSmooth.startSkinSmoothness(100);
-                        filterPhoto.setImageBitmap(skinSmooth.getBitmap());
-//                        RxImageData.bitmap(bitmap).addFilter(new BeautySkinFilter()).into(filterPhoto);
+                        skinSmooth.startSkinSmoothness(300);
+
+                        FileOutputStream stream = null;
+                        Bitmap filterBitmap = skinSmooth.getBitmap();
+                        final File file = new File(Environment.getExternalStorageDirectory(), System.currentTimeMillis() + ".jpeg");
+                        stream = new FileOutputStream(file);
+                        filterBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+                        Uri filterUri = Uri.fromFile(file);
+                        filterPhoto.setImageURI(filterUri);
+
+                        final CompositeDisposable disposable = new CompositeDisposable();
+                        Observable.interval(5000, TimeUnit.MILLISECONDS).observeOn(Schedulers.newThread())
+                                .subscribeOn(Schedulers.newThread()).subscribe(new Observer<Long>() {
+                            @Override
+                            public void onSubscribe(Disposable d) {
+                                disposable.add(d);
+                            }
+
+                            @Override
+                            public void onNext(Long aLong) {
+                                file.delete();
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+
+                            }
+
+                            @Override
+                            public void onComplete() {
+                                disposable.dispose();
+                                disposable.clear();
+                            }
+                        });
                     } catch (IOException e) {
 
                     }

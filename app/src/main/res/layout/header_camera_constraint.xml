@@ -39,11 +39,10 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_weight="0.5" />
 
-    <android.support.v7.widget.AppCompatImageView
+    <com.facebook.drawee.view.SimpleDraweeView
         android:id="@+id/filter_photo"
         android:layout_width="0px"
         android:layout_height="0px"
-        android:scaleType="fitXY"
         app:layout_constraintBottom_toTopOf="@id/camera_bottom_sheet"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"

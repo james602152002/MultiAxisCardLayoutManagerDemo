@@ -71,8 +71,6 @@ public class ScrollToTopBehavior extends CoordinatorLayout.Behavior<FloatingActi
             toggleFloatingBtn(child, true, dy);
         } else if (dy > 0 && recyclerView.canScrollVertically(1)) {
             toggleFloatingBtn(child, false, dy);
-        } else if (dy < 0 && !recyclerView.canScrollVertically(-1)) {
-            toggleFloatingBtn(child, false, dy);
         }
     }
 

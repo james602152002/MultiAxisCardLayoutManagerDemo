@@ -475,7 +475,8 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
 
                             @Override
                             public void onNext(Long aLong) {
-                                file.delete();
+                                if (file != null && file.exists())
+                                    file.delete();
                             }
 
                             @Override

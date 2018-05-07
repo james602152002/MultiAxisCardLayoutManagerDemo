@@ -2,8 +2,10 @@ package com.james602152002.multiaxiscardlayoutmanagerdemo.ui;
 
 import android.content.ContentResolver;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.net.Uri;
@@ -25,12 +27,12 @@ import android.support.v7.widget.AppCompatImageButton;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.amnix.skinsmoothness.AmniXSkinSmooth;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.hluhovskyi.camerabutton.CameraButton;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.R;
@@ -52,7 +54,6 @@ import com.wonderkiln.camerakit.CameraView;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.lang.ref.SoftReference;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -438,41 +439,42 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
                 SmoothScrollUtil.smoothScrollToTop(recyclerView);
                 break;
             case R.id.img_camera_filter:
-                if (cameraView.getTag() != null) {
-//                    Resources resources = getResources();
-//                    Uri uri = new Uri.Builder()
-//                            .scheme(ContentResolver.SCHEME_ANDROID_RESOURCE)
-//                            .authority(resources.getResourcePackageName(R.drawable.sample1))
-//                            .appendPath(resources.getResourceTypeName(R.drawable.sample1))
-//                            .appendPath(resources.getResourceEntryName(R.drawable.sample1))
-//                            .build();
+//                if (cameraView.getTag() != null) {
+                Resources resources = getResources();
+                Uri uri = new Uri.Builder()
+                        .scheme(ContentResolver.SCHEME_ANDROID_RESOURCE)
+                        .authority(resources.getResourcePackageName(R.drawable.sample2))
+                        .appendPath(resources.getResourceTypeName(R.drawable.sample2))
+                        .appendPath(resources.getResourceEntryName(R.drawable.sample2))
+                        .build();
 
-                    final Uri uri = (Uri) cameraView.getTag();
-                    originalPhoto.setImageURI(uri);
-                    AmniXSkinSmooth skinSmooth = AmniXSkinSmooth.getInstance();
-                    try {
-                        Bitmap bitmap = new SoftReference<>(MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri)).get();
-//                        Bitmap bitmap = BitmapFactory.decodeResource(resources, R.drawable.sample1);
-                        skinSmooth.storeBitmap(bitmap, true);
-                        skinSmooth.initSdk();
-                        skinSmooth.startSkinSmoothness(300);
+//                    final Uri uri = (Uri) cameraView.getTag();
+                originalPhoto.setImageURI(uri);
+//                    AmniXSkinSmooth skinSmooth = AmniXSkinSmooth.getInstance();
+                try {
+//                        Bitmap bitmap = new SoftReference<>(MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri)).get();
+                    Bitmap bitmap = BitmapFactory.decodeResource(resources, R.drawable.sample2);
+//                        skinSmooth.storeBitmap(bitmap, true);
+//                        skinSmooth.initSdk();
+//                        skinSmooth.startSkinSmoothness(300);
 
-                        FileOutputStream stream = null;
-                        Bitmap filterBitmap = skinSmooth.getBitmap();
-                        final File file = new File(Environment.getExternalStorageDirectory(), System.currentTimeMillis() + ".jpeg");
-                        stream = new FileOutputStream(file);
-                        filterBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
-                        Uri filterUri = Uri.fromFile(file);
-                        filterPhoto.setImageURI(filterUri);
+                    FileOutputStream stream = null;
+//                        Bitmap filterBitmap = skinSmooth.getBitmap();
+                    Bitmap filterBitmap = getGaussBitmap(bitmap);
+                    final File file = new File(Environment.getExternalStorageDirectory(), System.currentTimeMillis() + ".jpeg");
+                    stream = new FileOutputStream(file);
+                    filterBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+                    Uri filterUri = Uri.fromFile(file);
+                    filterPhoto.setImageURI(filterUri);
 
-                        Intent deleteIntent = new Intent(v.getContext(),ServiceDeleteFilterPhoto.class);
-                        deleteIntent.putExtra("uri", filterUri);
-                        startService(deleteIntent);
-                    } catch (IOException e) {
+                    Intent deleteIntent = new Intent(v.getContext(), ServiceDeleteFilterPhoto.class);
+                    deleteIntent.putExtra("uri", filterUri);
+                    startService(deleteIntent);
+                } catch (IOException e) {
 
-                    }
-                    skinSmooth.unInitSdk();
                 }
+//                    skinSmooth.unInitSdk();
+//                }
                 break;
         }
     }
@@ -487,5 +489,112 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
     protected void onPause() {
         super.onPause();
         cameraView.stop();
+    }
+
+    private Bitmap getGaussBitmap(Bitmap bitmap) {
+        final int width = bitmap.getWidth();
+        final int height = bitmap.getHeight();
+        int[] colors = new int[width * height];
+        final int temp_width = 10;
+        final int filter_width = temp_width % 2 == 0 ? temp_width + 1 : temp_width;
+        double[][] filter = getFilter(filter_width);
+//        for (int i = 0; i < colors.length; i++) {
+//            final int x = i % width;
+//            final int y = i / width;
+//            final int pixel = bitmap.getPixel(x, y);
+//
+//            int r = Color.red(pixel);
+//            int g = Color.green(pixel);
+//            int b = Color.blue(pixel);
+//
+//            double gauss_ratio = filter[x % filter_width][y % filter_width] * filter_width * filter_width;
+//
+//            r = (int) (r * gauss_ratio);
+//            g = (int) (g * gauss_ratio);
+//            b = (int) (b * gauss_ratio);
+//
+//            r = r > 255 ? 255 : r;
+//            g = g > 255 ? 255 : g;
+//            b = b > 255 ? 255 : b;
+//            colors[i] = 0xFF000000 + (r << 16) + (g << 8) + b;
+//        }
+
+        final int filter_size = filter_width * filter_width;
+        for (int h = 0; h < height; h += filter_width) {
+            for (int w = 0; w < width; w += filter_width) {
+                int sum_r = 0;
+                int sum_g = 0;
+                int sum_b = 0;
+                for (int j = h; j < h + filter_width && j < height; j++) {
+                    for (int i = w; i < w + filter_width && i < width; i++) {
+                        final int pixel = bitmap.getPixel(i, j);
+                        double r = Color.red(pixel);
+                        double g = Color.green(pixel);
+                        double b = Color.blue(pixel);
+
+                        double gauss_ratio = filter[i % filter_width][j % filter_width];
+
+                        r = (r * gauss_ratio);
+                        g = (g * gauss_ratio);
+                        b = (b * gauss_ratio);
+
+//                        final int ratio = filter_size;
+                        final float ratio = 1;
+//                        r *= ratio;
+//                        g *= ratio;
+//                        b *= ratio;
+//
+//                        r = r > 255 ? 255 : r;
+//                        g = g > 255 ? 255 : g;
+//                        b = b > 255 ? 255 : b;
+//                        colors[j * width + i] = 0xFF000000 + ((int) r << 16) + ((int) g << 8) + (int) b;
+                        sum_r += r;
+                        sum_g += g;
+                        sum_b += b;
+                    }
+                }
+
+                for (int j = h; j < h + filter_width && j < height; j++) {
+                    for (int i = w; i < w + filter_width && i < width; i++) {
+                        sum_r = sum_r > 255 ? 255 : sum_r;
+                        sum_g = sum_g > 255 ? 255 : sum_g;
+                        sum_b = sum_b > 255 ? 255 : sum_b;
+                        colors[j * width + i] = 0xFF000000 + (sum_r << 16) + (sum_g << 8) + sum_b;
+                    }
+                }
+            }
+        }
+
+        Bitmap gaussBitmap = Bitmap.createBitmap(colors, width, height, Bitmap.Config.ARGB_8888);
+        return gaussBitmap;
+    }
+
+    private double[][] getFilter(int width) {
+        final double[][] filter = new double[width][width];
+        final int semi_width = (width - 1) >> 1;
+        double sigma = 1.5;
+        double r, s = 2.0 * sigma * sigma;
+
+        // sum is for normalization
+        double sum = 0.0;
+
+        // generating 5x5 kernel
+        for (int x = -semi_width; x <= semi_width; x++) {
+            for (int y = -semi_width; y <= semi_width; y++) {
+                r = Math.sqrt(x * x + y * y);
+                filter[x + semi_width][y + semi_width] =
+                        (Math.exp(-(r * r) / s)) / (Math.PI * s);
+                sum += filter[x + semi_width][y + semi_width];
+            }
+        }
+
+        // normalising the Kernel
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < width; j++) {
+                filter[i][j] /= sum;
+                Log.i("", "filter =============== (" + i + "," + j + ") ============= " + filter[i][j]);
+            }
+        }
+        return filter;
     }
 }

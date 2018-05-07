@@ -11,6 +11,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.Gravity;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -65,8 +66,15 @@ public class ActivityCardDetail extends ActivityTranslucent {
         setContentView(R.layout.activity_card_detail);
         ButterKnife.bind(this);
 
+        Log.i("", "result ===================== " + getGaussResult(1, 1));
+
         initToolBar();
         initView();
+    }
+
+    private double getGaussResult(double x, double y) {
+        final double sigma = 1.5;
+        return Math.exp(-(Math.pow(x, 2) + Math.pow(y, 2)) / (2 * Math.pow(sigma, 2))) / (2 * Math.PI * Math.pow(sigma, 2));
     }
 
     private void initToolBar() {

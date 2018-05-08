@@ -52,8 +52,8 @@ import com.wonderkiln.camerakit.CameraKitVideo;
 import com.wonderkiln.camerakit.CameraView;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -423,7 +423,7 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
 
     @OnClick({R.id.img_camera_rotate, R.id.action_btn, R.id.img_camera_filter})
     @Override
-    public void onClick(View v) {
+    public void onClick(final View v) {
         switch (v.getId()) {
             case R.id.img_camera_rotate:
                 switch (cameraView.getFacing()) {
@@ -440,7 +440,7 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
                 break;
             case R.id.img_camera_filter:
 //                if (cameraView.getTag() != null) {
-                Resources resources = getResources();
+                final Resources resources = getResources();
                 Uri uri = new Uri.Builder()
                         .scheme(ContentResolver.SCHEME_ANDROID_RESOURCE)
                         .authority(resources.getResourcePackageName(R.drawable.sample2))
@@ -451,28 +451,73 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
 //                    final Uri uri = (Uri) cameraView.getTag();
                 originalPhoto.setImageURI(uri);
 //                    AmniXSkinSmooth skinSmooth = AmniXSkinSmooth.getInstance();
-                try {
-//                        Bitmap bitmap = new SoftReference<>(MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri)).get();
-                    Bitmap bitmap = BitmapFactory.decodeResource(resources, R.drawable.sample2);
-//                        skinSmooth.storeBitmap(bitmap, true);
-//                        skinSmooth.initSdk();
-//                        skinSmooth.startSkinSmoothness(300);
+//                try {
+////                        Bitmap bitmap = new SoftReference<>(MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri)).get();
+//                    Bitmap bitmap = BitmapFactory.decodeResource(resources, R.drawable.sample2);
+////                        skinSmooth.storeBitmap(bitmap, true);
+////                        skinSmooth.initSdk();
+////                        skinSmooth.startSkinSmoothness(300);
+//
+//                    FileOutputStream stream = null;
+////                        Bitmap filterBitmap = skinSmooth.getBitmap();
+//                    Bitmap filterBitmap = getGaussBitmap(bitmap);
+//                    final File file = new File(Environment.getExternalStorageDirectory(), System.currentTimeMillis() + ".jpeg");
+//                    stream = new FileOutputStream(file);
+//                    filterBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+//                    Uri filterUri = Uri.fromFile(file);
+//                    filterPhoto.setImageURI(filterUri);
+//
+//                    Intent deleteIntent = new Intent(v.getContext(), ServiceDeleteFilterPhoto.class);
+//                    deleteIntent.putExtra("uri", filterUri);
+//                    startService(deleteIntent);
+//                } catch (IOException e) {
+//
+//                }
 
-                    FileOutputStream stream = null;
-//                        Bitmap filterBitmap = skinSmooth.getBitmap();
-                    Bitmap filterBitmap = getGaussBitmap(bitmap);
-                    final File file = new File(Environment.getExternalStorageDirectory(), System.currentTimeMillis() + ".jpeg");
-                    stream = new FileOutputStream(file);
-                    filterBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
-                    Uri filterUri = Uri.fromFile(file);
-                    filterPhoto.setImageURI(filterUri);
+                final CompositeDisposable disposable = new CompositeDisposable();
+                Observable<Bitmap> observable = Observable.create(new ObservableOnSubscribe<Bitmap>() {
+                    @Override
+                    public void subscribe(ObservableEmitter<Bitmap> emitter) {
+                        Bitmap bitmap = BitmapFactory.decodeResource(resources, R.drawable.sample2);
+                        Bitmap filterBitmap = getGaussBitmap(bitmap);
+                        emitter.onNext(filterBitmap);
+                    }
+                });
 
-                    Intent deleteIntent = new Intent(v.getContext(), ServiceDeleteFilterPhoto.class);
-                    deleteIntent.putExtra("uri", filterUri);
-                    startService(deleteIntent);
-                } catch (IOException e) {
+                observable.subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Observer<Bitmap>() {
+                            @Override
+                            public void onSubscribe(Disposable d) {
+                                disposable.add(d);
+                            }
 
-                }
+                            @Override
+                            public void onNext(Bitmap bitmap) {
+                                try {
+                                    final File file = new File(Environment.getExternalStorageDirectory(), System.currentTimeMillis() + ".jpeg");
+                                    FileOutputStream stream = new FileOutputStream(file);
+                                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+                                    Uri filterUri = Uri.fromFile(file);
+                                    filterPhoto.setImageURI(filterUri);
+                                    Intent deleteIntent = new Intent(v.getContext(), ServiceDeleteFilterPhoto.class);
+                                    deleteIntent.putExtra("uri", filterUri);
+                                    startService(deleteIntent);
+                                } catch (FileNotFoundException e) {
+
+                                }
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+
+                            }
+
+                            @Override
+                            public void onComplete() {
+                                disposable.dispose();
+                                disposable.clear();
+                            }
+                        });
 //                    skinSmooth.unInitSdk();
 //                }
                 break;
@@ -495,71 +540,38 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
         final int width = bitmap.getWidth();
         final int height = bitmap.getHeight();
         int[] colors = new int[width * height];
-        final int temp_width = 10;
+        final int temp_width = 3;
         final int filter_width = temp_width % 2 == 0 ? temp_width + 1 : temp_width;
-        double[][] filter = getFilter(filter_width);
-//        for (int i = 0; i < colors.length; i++) {
-//            final int x = i % width;
-//            final int y = i / width;
-//            final int pixel = bitmap.getPixel(x, y);
-//
-//            int r = Color.red(pixel);
-//            int g = Color.green(pixel);
-//            int b = Color.blue(pixel);
-//
-//            double gauss_ratio = filter[x % filter_width][y % filter_width] * filter_width * filter_width;
-//
-//            r = (int) (r * gauss_ratio);
-//            g = (int) (g * gauss_ratio);
-//            b = (int) (b * gauss_ratio);
-//
-//            r = r > 255 ? 255 : r;
-//            g = g > 255 ? 255 : g;
-//            b = b > 255 ? 255 : b;
-//            colors[i] = 0xFF000000 + (r << 16) + (g << 8) + b;
-//        }
+        float[][] filter = getFilter(filter_width);
 
-        final int filter_size = filter_width * filter_width;
-        for (int h = 0; h < height; h += filter_width) {
-            for (int w = 0; w < width; w += filter_width) {
-                int sum_r = 0;
-                int sum_g = 0;
-                int sum_b = 0;
-                for (int j = h; j < h + filter_width && j < height; j++) {
-                    for (int i = w; i < w + filter_width && i < width; i++) {
-                        final int pixel = bitmap.getPixel(i, j);
-                        double r = Color.red(pixel);
-                        double g = Color.green(pixel);
-                        double b = Color.blue(pixel);
+        int r = 0;
+        int g = 0;
+        int b = 0;
+        int x = 0;
+        int y = 0;
+        int pixel = 0;
+//        final int pixel = Color.RED;
+        for (int h = 0; h < height; h++) {
+            for (int w = 0; w < width; w++) {
+                for (int j = 0; j < filter_width; j++) {
+                    for (int i = 0; i < filter_width; i++) {
+                        x = i + w;
+                        y = j + h;
+                        if (x >= width || y >= height) {
+                            continue;
+                        }
+                        pixel = bitmap.getPixel(x, y);
 
-                        double gauss_ratio = filter[i % filter_width][j % filter_width];
-
-                        r = (r * gauss_ratio);
-                        g = (g * gauss_ratio);
-                        b = (b * gauss_ratio);
-
-//                        final int ratio = filter_size;
-                        final float ratio = 1;
-//                        r *= ratio;
-//                        g *= ratio;
-//                        b *= ratio;
-//
-//                        r = r > 255 ? 255 : r;
-//                        g = g > 255 ? 255 : g;
-//                        b = b > 255 ? 255 : b;
-//                        colors[j * width + i] = 0xFF000000 + ((int) r << 16) + ((int) g << 8) + (int) b;
-                        sum_r += r;
-                        sum_g += g;
-                        sum_b += b;
-                    }
-                }
-
-                for (int j = h; j < h + filter_width && j < height; j++) {
-                    for (int i = w; i < w + filter_width && i < width; i++) {
-                        sum_r = sum_r > 255 ? 255 : sum_r;
-                        sum_g = sum_g > 255 ? 255 : sum_g;
-                        sum_b = sum_b > 255 ? 255 : sum_b;
-                        colors[j * width + i] = 0xFF000000 + (sum_r << 16) + (sum_g << 8) + sum_b;
+                        r = Color.red(pixel);
+                        g = Color.green(pixel);
+                        b = Color.blue(pixel);
+                        float gauss_ratio = filter[i][j];
+                        r = (int) (r * gauss_ratio);
+                        g = (int) (g * gauss_ratio);
+                        b = (int) (b * gauss_ratio);
+                        int color = 0xFF000000 + ((int) r << 16) + ((int) g << 8) + (int) b;
+                        colors[y * width + x] += color;
+                        Log.i("", "!!!!");
                     }
                 }
             }
@@ -569,8 +581,8 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
         return gaussBitmap;
     }
 
-    private double[][] getFilter(int width) {
-        final double[][] filter = new double[width][width];
+    private float[][] getFilter(int width) {
+        final float[][] filter = new float[width][width];
         final int semi_width = (width - 1) >> 1;
         double sigma = 1.5;
         double r, s = 2.0 * sigma * sigma;
@@ -583,7 +595,7 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
             for (int y = -semi_width; y <= semi_width; y++) {
                 r = Math.sqrt(x * x + y * y);
                 filter[x + semi_width][y + semi_width] =
-                        (Math.exp(-(r * r) / s)) / (Math.PI * s);
+                        (float)((Math.exp(-(r * r) / s)) / (Math.PI * s));
                 sum += filter[x + semi_width][y + semi_width];
             }
         }
@@ -597,4 +609,5 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
         }
         return filter;
     }
+
 }

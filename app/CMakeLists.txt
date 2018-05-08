@@ -12,12 +12,18 @@ cmake_minimum_required(VERSION 3.4.1)
 
 aux_source_directory(src/main/cpp/bitmap BITMAP_SRC_LIST)
 aux_source_directory(src/main/cpp/skinsmooth SKINSMOOTH_SRC_LIST)
+aux_source_directory(src/main/cpp/gaussian GAUSSIAN_SRC_LIST)
 
 add_library(AmniXSkinSmooth
             SHARED
             src/main/cpp/AmniXSkinSmooth.cpp
             ${SKINSMOOTH_SRC_LIST}
-            ${BITMAP_SRC_LIST} )
+            ${BITMAP_SRC_LIST})
+
+add_library(GaussianBlur
+            SHARED
+            src/main/cpp/GaussianBlur.cpp
+            ${GAUSSIAN_SRC_LIST})
 
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by
@@ -43,3 +49,7 @@ target_link_libraries( # Specifies the target library.
                        # included in the NDK.
                        ${log-lib}
                        jnigraphics )
+
+
+target_link_libraries(GaussianBlur
+                      jnigraphics )

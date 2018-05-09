@@ -443,9 +443,9 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
                 final Resources resources = getResources();
                 Uri uri = new Uri.Builder()
                         .scheme(ContentResolver.SCHEME_ANDROID_RESOURCE)
-                        .authority(resources.getResourcePackageName(R.drawable.sample2))
-                        .appendPath(resources.getResourceTypeName(R.drawable.sample2))
-                        .appendPath(resources.getResourceEntryName(R.drawable.sample2))
+                        .authority(resources.getResourcePackageName(R.drawable.sample1))
+                        .appendPath(resources.getResourceTypeName(R.drawable.sample1))
+                        .appendPath(resources.getResourceEntryName(R.drawable.sample1))
                         .build();
 
 //                    final Uri uri = (Uri) cameraView.getTag();
@@ -453,7 +453,7 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
 //                    AmniXSkinSmooth skinSmooth = AmniXSkinSmooth.getInstance();
 //                try {
 ////                        Bitmap bitmap = new SoftReference<>(MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri)).get();
-//                    Bitmap bitmap = BitmapFactory.decodeResource(resources, R.drawable.sample2);
+//                    Bitmap bitmap = BitmapFactory.decodeResource(resources, R.drawable.sample1);
 ////                        skinSmooth.storeBitmap(bitmap, true);
 ////                        skinSmooth.initSdk();
 ////                        skinSmooth.startSkinSmoothness(300);
@@ -478,7 +478,7 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
                 Observable<Bitmap> observable = Observable.create(new ObservableOnSubscribe<Bitmap>() {
                     @Override
                     public void subscribe(ObservableEmitter<Bitmap> emitter) {
-                        Bitmap bitmap = BitmapFactory.decodeResource(resources, R.drawable.sample2);
+                        Bitmap bitmap = BitmapFactory.decodeResource(resources, R.drawable.sample1);
                         Bitmap filterBitmap = getGaussBitmap(bitmap);
                         emitter.onNext(filterBitmap);
                     }
@@ -540,17 +540,20 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
         final int width = bitmap.getWidth();
         final int height = bitmap.getHeight();
         int[] colors = new int[width * height];
-        final int temp_width = 3;
+        final int temp_width = 15;
         final int filter_width = temp_width % 2 == 0 ? temp_width + 1 : temp_width;
-        float[][] filter = getFilter(filter_width);
+        double[][] filter = getFilter(filter_width);
 
-        int r = 0;
-        int g = 0;
-        int b = 0;
-        int x = 0;
-        int y = 0;
-        int pixel = 0;
-//        final int pixel = Color.RED;
+        double r;
+        double g;
+        double b;
+        int x;
+        int y;
+        int pixel;
+        double[][] distributeColorRed = new double[filter_width][filter_width];
+        double[][] distributeColorGreen = new double[filter_width][filter_width];
+        double[][] distributeColorBlue = new double[filter_width][filter_width];
+        Log.i("", "start");
         for (int h = 0; h < height; h++) {
             for (int w = 0; w < width; w++) {
                 for (int j = 0; j < filter_width; j++) {
@@ -558,6 +561,12 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
                         x = i + w;
                         y = j + h;
                         if (x >= width || y >= height) {
+                            r = 0;
+                            g = 0;
+                            b = 0;
+                            distributeColorRed[i][j] = r;
+                            distributeColorGreen[i][j] = g;
+                            distributeColorBlue[i][j] = b;
                             continue;
                         }
                         pixel = bitmap.getPixel(x, y);
@@ -565,26 +574,44 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
                         r = Color.red(pixel);
                         g = Color.green(pixel);
                         b = Color.blue(pixel);
-                        float gauss_ratio = filter[i][j];
-                        r = (int) (r * gauss_ratio);
-                        g = (int) (g * gauss_ratio);
-                        b = (int) (b * gauss_ratio);
-                        int color = 0xFF000000 + ((int) r << 16) + ((int) g << 8) + (int) b;
-                        colors[y * width + x] += color;
-                        Log.i("", "!!!!");
+                        double gauss_ratio = filter[i][j];
+                        r *= gauss_ratio;
+                        g *= gauss_ratio;
+                        b *= gauss_ratio;
+
+                        distributeColorRed[i][j] = r;
+                        distributeColorGreen[i][j] = g;
+                        distributeColorBlue[i][j] = b;
                     }
                 }
+                r = generateDistributeColorInPixel(distributeColorRed);
+                g = generateDistributeColorInPixel(distributeColorGreen);
+                b = generateDistributeColorInPixel(distributeColorBlue);
+                int color = 0xFF000000 + ((int) r << 16) + ((int) g << 8) + (int) b;
+                colors[h * width + w] = color;
             }
+            Log.i("", "current y ======== " + h + " , height ======== " + height);
         }
+        Log.i("", "end");
 
         Bitmap gaussBitmap = Bitmap.createBitmap(colors, width, height, Bitmap.Config.ARGB_8888);
         return gaussBitmap;
     }
 
-    private float[][] getFilter(int width) {
-        final float[][] filter = new float[width][width];
+    private int generateDistributeColorInPixel(double[][] distributeColor) {
+        int summation = 0;
+        for (int y = 0; y < distributeColor.length; y++) {
+            for (int x = 0; x < distributeColor[y].length; x++) {
+                summation += distributeColor[x][y];
+            }
+        }
+        return summation;
+    }
+
+    private double[][] getFilter(int width) {
+        final double[][] filter = new double[width][width];
         final int semi_width = (width - 1) >> 1;
-        double sigma = 1.5;
+        double sigma = 3;
         double r, s = 2.0 * sigma * sigma;
 
         // sum is for normalization
@@ -595,7 +622,7 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
             for (int y = -semi_width; y <= semi_width; y++) {
                 r = Math.sqrt(x * x + y * y);
                 filter[x + semi_width][y + semi_width] =
-                        (float)((Math.exp(-(r * r) / s)) / (Math.PI * s));
+                        (Math.exp(-(r * r) / s)) / (Math.PI * s);
                 sum += filter[x + semi_width][y + semi_width];
             }
         }
@@ -604,7 +631,6 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < width; j++) {
                 filter[i][j] /= sum;
-                Log.i("", "filter =============== (" + i + "," + j + ") ============= " + filter[i][j]);
             }
         }
         return filter;

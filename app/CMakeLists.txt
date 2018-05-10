@@ -52,4 +52,5 @@ target_link_libraries( # Specifies the target library.
 
 
 target_link_libraries(GaussianBlur
+                      ${log-lib}
                       jnigraphics )

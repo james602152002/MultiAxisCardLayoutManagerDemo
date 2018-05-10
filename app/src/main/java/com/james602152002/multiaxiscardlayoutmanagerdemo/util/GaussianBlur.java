@@ -23,7 +23,15 @@ public class GaussianBlur {
         return this;
     }
 
+    public Bitmap getBitmap() {
+        if (mByteBuffer == null)
+            return null;
+        return jniGetBitmap(mByteBuffer);
+    }
+
     private native ByteBuffer jniStoreBitmap(Bitmap bitmap);
 
     private native void jniInitSdk(ByteBuffer byteBuffer);
+
+    private native Bitmap jniGetBitmap(ByteBuffer mByteBuffer);
 }

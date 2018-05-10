@@ -13,6 +13,8 @@
 class BitmapOperation {
 public:
     static jobject jniStoreBitmapData(JNIEnv *env, jobject obj, jobject bitmap);
+    static jobject jniGetBitmapFromStoredBitmapData(
+            JNIEnv *env, jobject obj, jobject handle);
 };
 
 

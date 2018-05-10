@@ -27,7 +27,6 @@ import android.support.v7.widget.AppCompatImageButton;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -41,6 +40,7 @@ import com.james602152002.multiaxiscardlayoutmanagerdemo.fragment.CameraCropFrag
 import com.james602152002.multiaxiscardlayoutmanagerdemo.interfaces.CameraCropListener;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.recyclerview.item_decoration.CameraGalleryDecoration;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.service.ServiceDeleteFilterPhoto;
+import com.james602152002.multiaxiscardlayoutmanagerdemo.util.GaussianBlur;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.util.IPhone6ScreenResizeUtil;
 import com.james602152002.multiaxiscardlayoutmanagerdemo.util.SmoothScrollUtil;
 import com.wonderkiln.camerakit.CameraKit;
@@ -98,6 +98,7 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
     @BindView(R.id.img_camera_filter)
     AppCompatImageButton imgCameraFilter;
     private boolean usingCamera = false;
+    private CompositeDisposable disposable;
 
 
     @Override
@@ -443,9 +444,9 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
                 final Resources resources = getResources();
                 Uri uri = new Uri.Builder()
                         .scheme(ContentResolver.SCHEME_ANDROID_RESOURCE)
-                        .authority(resources.getResourcePackageName(R.drawable.sample1))
-                        .appendPath(resources.getResourceTypeName(R.drawable.sample1))
-                        .appendPath(resources.getResourceEntryName(R.drawable.sample1))
+                        .authority(resources.getResourcePackageName(R.drawable.sample2))
+                        .appendPath(resources.getResourceTypeName(R.drawable.sample2))
+                        .appendPath(resources.getResourceEntryName(R.drawable.sample2))
                         .build();
 
 //                    final Uri uri = (Uri) cameraView.getTag();
@@ -453,7 +454,7 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
 //                    AmniXSkinSmooth skinSmooth = AmniXSkinSmooth.getInstance();
 //                try {
 ////                        Bitmap bitmap = new SoftReference<>(MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri)).get();
-//                    Bitmap bitmap = BitmapFactory.decodeResource(resources, R.drawable.sample1);
+//                    Bitmap bitmap = BitmapFactory.decodeResource(resources, R.drawable.sample2);
 ////                        skinSmooth.storeBitmap(bitmap, true);
 ////                        skinSmooth.initSdk();
 ////                        skinSmooth.startSkinSmoothness(300);
@@ -474,13 +475,22 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
 //
 //                }
 
-                final CompositeDisposable disposable = new CompositeDisposable();
+                if (disposable != null) {
+                    disposable.dispose();
+                    disposable.clear();
+                } else {
+                    disposable = new CompositeDisposable();
+                }
                 Observable<Bitmap> observable = Observable.create(new ObservableOnSubscribe<Bitmap>() {
                     @Override
                     public void subscribe(ObservableEmitter<Bitmap> emitter) {
-                        Bitmap bitmap = BitmapFactory.decodeResource(resources, R.drawable.sample1);
-                        Bitmap filterBitmap = getGaussBitmap(bitmap);
-                        emitter.onNext(filterBitmap);
+                        Bitmap bitmap = BitmapFactory.decodeResource(resources, R.drawable.sample2);
+
+                        GaussianBlur blur = new GaussianBlur();
+                        emitter.onNext(blur.storeBitmap(bitmap).initSdk().getBitmap());
+
+//                        Bitmap filterBitmap = getGaussBitmap(bitmap);
+//                        emitter.onNext(filterBitmap);
                     }
                 });
 
@@ -536,104 +546,10 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
         cameraView.stop();
     }
 
-    private Bitmap getGaussBitmap(Bitmap bitmap) {
-        final int width = bitmap.getWidth();
-        final int height = bitmap.getHeight();
-        int[] colors = new int[width * height];
-        final int temp_width = 15;
-        final int filter_width = temp_width % 2 == 0 ? temp_width + 1 : temp_width;
-        double[][] filter = getFilter(filter_width);
-
-        double r;
-        double g;
-        double b;
-        int x;
-        int y;
-        int pixel;
-        double[][] distributeColorRed = new double[filter_width][filter_width];
-        double[][] distributeColorGreen = new double[filter_width][filter_width];
-        double[][] distributeColorBlue = new double[filter_width][filter_width];
-        Log.i("", "start");
-        for (int h = 0; h < height; h++) {
-            for (int w = 0; w < width; w++) {
-                for (int j = 0; j < filter_width; j++) {
-                    for (int i = 0; i < filter_width; i++) {
-                        x = i + w;
-                        y = j + h;
-                        if (x >= width || y >= height) {
-                            r = 0;
-                            g = 0;
-                            b = 0;
-                            distributeColorRed[i][j] = r;
-                            distributeColorGreen[i][j] = g;
-                            distributeColorBlue[i][j] = b;
-                            continue;
-                        }
-                        pixel = bitmap.getPixel(x, y);
-
-                        r = Color.red(pixel);
-                        g = Color.green(pixel);
-                        b = Color.blue(pixel);
-                        double gauss_ratio = filter[i][j];
-                        r *= gauss_ratio;
-                        g *= gauss_ratio;
-                        b *= gauss_ratio;
-
-                        distributeColorRed[i][j] = r;
-                        distributeColorGreen[i][j] = g;
-                        distributeColorBlue[i][j] = b;
-                    }
-                }
-                r = generateDistributeColorInPixel(distributeColorRed);
-                g = generateDistributeColorInPixel(distributeColorGreen);
-                b = generateDistributeColorInPixel(distributeColorBlue);
-                int color = 0xFF000000 + ((int) r << 16) + ((int) g << 8) + (int) b;
-                colors[h * width + w] = color;
-            }
-            Log.i("", "current y ======== " + h + " , height ======== " + height);
-        }
-        Log.i("", "end");
-
-        Bitmap gaussBitmap = Bitmap.createBitmap(colors, width, height, Bitmap.Config.ARGB_8888);
-        return gaussBitmap;
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        disposable.dispose();
+        disposable.clear();
     }
-
-    private int generateDistributeColorInPixel(double[][] distributeColor) {
-        int summation = 0;
-        for (int y = 0; y < distributeColor.length; y++) {
-            for (int x = 0; x < distributeColor[y].length; x++) {
-                summation += distributeColor[x][y];
-            }
-        }
-        return summation;
-    }
-
-    private double[][] getFilter(int width) {
-        final double[][] filter = new double[width][width];
-        final int semi_width = (width - 1) >> 1;
-        double sigma = 3;
-        double r, s = 2.0 * sigma * sigma;
-
-        // sum is for normalization
-        double sum = 0.0;
-
-        // generating 5x5 kernel
-        for (int x = -semi_width; x <= semi_width; x++) {
-            for (int y = -semi_width; y <= semi_width; y++) {
-                r = Math.sqrt(x * x + y * y);
-                filter[x + semi_width][y + semi_width] =
-                        (Math.exp(-(r * r) / s)) / (Math.PI * s);
-                sum += filter[x + semi_width][y + semi_width];
-            }
-        }
-
-        // normalising the Kernel
-        for (int i = 0; i < width; i++) {
-            for (int j = 0; j < width; j++) {
-                filter[i][j] /= sum;
-            }
-        }
-        return filter;
-    }
-
 }

@@ -4,6 +4,10 @@
 
 #include <jni.h>
 #include "gaussian/BitmapOperation.h"
+#include "gaussian/GaussianBlurFilter.h"
+
+#define LOG_TAG "cpp"
+#define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG,LOG_TAG,__VA_ARGS__)
 
 extern "C" {
 JNIEXPORT jobject JNICALL
@@ -17,11 +21,17 @@ JNIEXPORT void JNICALL
 Java_com_james602152002_multiaxiscardlayoutmanagerdemo_util_GaussianBlur_jniInitSdk(JNIEnv *env,
                                                                                     jobject obj,
                                                                                     jobject handle) {
-    JniBitmap *jniBitmap = (JniBitmap *)env->GetDirectBufferAddress(handle);
-    if(jniBitmap->_storedBitmapPixels == NULL) {
+    JniBitmap *jniBitmap = (JniBitmap *) env->GetDirectBufferAddress(handle);
+    if (jniBitmap->_storedBitmapPixels == NULL) {
         return;
     }
-//    GaussianBlur::
+    GaussianBlurFilter::getInstance()->startGaussianBlur(jniBitmap);
 }
 
+JNIEXPORT jobject JNICALL
+Java_com_james602152002_multiaxiscardlayoutmanagerdemo_util_GaussianBlur_jniGetBitmap(JNIEnv *env,
+                                                                                      jobject obj,
+                                                                                      jobject handle) {
+    return BitmapOperation::jniGetBitmapFromStoredBitmapData(env, obj, handle);
+}
 }

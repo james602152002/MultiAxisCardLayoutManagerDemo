@@ -20,7 +20,7 @@ GaussianBlurFilter *GaussianBlurFilter::getInstance() {
     return instance;
 }
 
-void GaussianBlurFilter::startGaussianBlur(JniBitmap *jniBitmap) {
+void GaussianBlurFilter::startGaussianBlur(JniBitmap *jniBitmap, double sigma, int radius) {
     storedBitmapPixels = jniBitmap->_storedBitmapPixels;
     mImageWidth = jniBitmap->_bitmapInfo.width;
     mImageHeight = jniBitmap->_bitmapInfo.height;
@@ -31,7 +31,6 @@ void GaussianBlurFilter::startGaussianBlur(JniBitmap *jniBitmap) {
     }
     memcpy(mImageData_rgb, storedBitmapPixels, sizeof(uint32_t) * img_size);
 
-    int radius = 100;
     int filter_width = (radius << 1) + 1;
     int filter_size = filter_width * filter_width;
     int r = 0;
@@ -42,9 +41,9 @@ void GaussianBlurFilter::startGaussianBlur(JniBitmap *jniBitmap) {
     double *distributeColorGreen = new double[filter_size];
     double *distributeColorBlue = new double[filter_size];
 
-    normalizeFilter(3, filter_width);
+    normalizeFilter(sigma, filter_width);
 
-    float lightness = (float) pow(radius, 0.25f);
+    float lightness = (float) pow(radius, 0.2f);
 
     for (int h = 0; h < mImageHeight; h++) {
         for (int w = 0; w < mImageWidth; w++) {
@@ -77,6 +76,9 @@ void GaussianBlurFilter::startGaussianBlur(JniBitmap *jniBitmap) {
         }
         LOGD("h ========= %d", h);
     }
+    delete distributeColorRed;
+    delete distributeColorGreen;
+    delete distributeColorBlue;
 }
 
 void GaussianBlurFilter::normalizeFilter(double sigma, int filter_size) {
@@ -115,4 +117,10 @@ int GaussianBlurFilter::generateDistributeColorInPixel(double *distribute_color,
     }
     summation = summation > 255 ? 255 : summation;
     return summation;
+}
+
+void GaussianBlurFilter::unInit() {
+    if (instance != NULL)
+        delete instance;
+    instance = NULL;
 }

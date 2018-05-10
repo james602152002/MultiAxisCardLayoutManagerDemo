@@ -11,9 +11,15 @@
 class GaussianBlurFilter {
 public:
     static GaussianBlurFilter *getInstance();
-    void startGaussianBlur(JniBitmap *jniBitmap);
+
+    void startGaussianBlur(JniBitmap *jniBitmap, double sigma, int radius);
+
     void normalizeFilter(double sigma, int filter_size);
+
     int generateDistributeColorInPixel(double *distribute_color, int filter_width);
+
+    void unInit();
+
 private:
     static GaussianBlurFilter *instance;
     uint32_t *storedBitmapPixels;

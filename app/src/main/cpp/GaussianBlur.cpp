@@ -20,12 +20,14 @@ Java_com_james602152002_multiaxiscardlayoutmanagerdemo_util_GaussianBlur_jniStor
 JNIEXPORT void JNICALL
 Java_com_james602152002_multiaxiscardlayoutmanagerdemo_util_GaussianBlur_jniInitSdk(JNIEnv *env,
                                                                                     jobject obj,
-                                                                                    jobject handle) {
+                                                                                    jobject handle,
+                                                                                    jdouble sigma,
+                                                                                    jint radius) {
     JniBitmap *jniBitmap = (JniBitmap *) env->GetDirectBufferAddress(handle);
     if (jniBitmap->_storedBitmapPixels == NULL) {
         return;
     }
-    GaussianBlurFilter::getInstance()->startGaussianBlur(jniBitmap);
+    GaussianBlurFilter::getInstance()->startGaussianBlur(jniBitmap, sigma, radius);
 }
 
 JNIEXPORT jobject JNICALL
@@ -33,5 +35,11 @@ Java_com_james602152002_multiaxiscardlayoutmanagerdemo_util_GaussianBlur_jniGetB
                                                                                       jobject obj,
                                                                                       jobject handle) {
     return BitmapOperation::jniGetBitmapFromStoredBitmapData(env, obj, handle);
+}
+
+JNIEXPORT void JNICALL
+Java_com_james602152002_multiaxiscardlayoutmanagerdemo_util_GaussianBlur_unInit(JNIEnv *env,
+                                                                                jobject obj) {
+    GaussianBlurFilter::getInstance()->unInit();
 }
 }

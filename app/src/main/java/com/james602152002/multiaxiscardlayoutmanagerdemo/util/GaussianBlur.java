@@ -17,9 +17,9 @@ public class GaussianBlur {
         return this;
     }
 
-    public GaussianBlur initSdk() {
+    public GaussianBlur initSdk(double sigma, int radius) {
         if (mByteBuffer != null)
-            jniInitSdk(mByteBuffer);
+            jniInitSdk(mByteBuffer,sigma, radius);
         return this;
     }
 
@@ -29,9 +29,11 @@ public class GaussianBlur {
         return jniGetBitmap(mByteBuffer);
     }
 
+    public native void unInit();
+
     private native ByteBuffer jniStoreBitmap(Bitmap bitmap);
 
-    private native void jniInitSdk(ByteBuffer byteBuffer);
+    private native void jniInitSdk(ByteBuffer byteBuffer, double sigma, int radius);
 
     private native Bitmap jniGetBitmap(ByteBuffer mByteBuffer);
 }

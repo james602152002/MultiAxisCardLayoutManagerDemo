@@ -78,11 +78,11 @@ void GaussianBlurFilter::startGaussianBlur(JniBitmap *jniBitmap, double sigma, i
         LOGD("h ========= %d", h);
     }
     delete distributeColorRed;
+    distributeColorRed = NULL;
     delete distributeColorGreen;
+    distributeColorGreen = NULL;
     delete distributeColorBlue;
-    if(r == NULL) {
-        LOGD("null");
-    }
+    distributeColorBlue = NULL;
 }
 
 void GaussianBlurFilter::normalizeFilter(double sigma, int filter_size) {

@@ -33,9 +33,9 @@ void GaussianBlurFilter::startGaussianBlur(JniBitmap *jniBitmap, double sigma, i
 
     int filter_width = (radius << 1) + 1;
     int filter_size = filter_width * filter_width;
-    int r = 0;
-    int g = 0;
-    int b = 0;
+    int *r;
+    int *g;
+    int *b;
 
     double *distributeColorRed = new double[filter_size];
     double *distributeColorGreen = new double[filter_size];
@@ -57,28 +57,32 @@ void GaussianBlurFilter::startGaussianBlur(JniBitmap *jniBitmap, double sigma, i
                     continue;
                 }
                 int color = storedBitmapPixels[x + y * mImageWidth];
-                r = (color & 0xFF0000) >> 16;
-                g = (color & 0xFF00) >> 8;
-                b = color & 0xFF;
-                r *= lightness;
-                g *= lightness;
-                b *= lightness;
-                distributeColorRed[j] = filter[j] * r;
-                distributeColorGreen[j] = filter[j] * g;
-                distributeColorBlue[j] = filter[j] * b;
+                int _r = (int) (((color & 0xFF0000) >> 16) * lightness);
+                int _g = (int) (((color & 0xFF00) >> 8) * lightness);
+                int _b = (int) ((color & 0xFF) * lightness);
+                r = &_r;
+                g = &_g;
+                b = &_b;
+                distributeColorRed[j] = filter[j] * *r;
+                distributeColorGreen[j] = filter[j] * *g;
+                distributeColorBlue[j] = filter[j] * *b;
             }
-            r = generateDistributeColorInPixel(distributeColorRed, filter_size);
-            g = generateDistributeColorInPixel(distributeColorGreen, filter_size);
-            b = generateDistributeColorInPixel(distributeColorBlue, filter_size);
-            storedBitmapPixels[h * mImageWidth + w] = 0xFF000000 + (r << 16) + (g << 8) + b;
-//            LOGD("R = %x G = %x B = %x", r, g, b);
-//            LOGD("%x", storedBitmapPixels[h * mImageWidth + w]);
+            int _r = generateDistributeColorInPixel(distributeColorRed, filter_size);
+            int _g = generateDistributeColorInPixel(distributeColorGreen, filter_size);
+            int _b = generateDistributeColorInPixel(distributeColorBlue, filter_size);
+            r = &_r;
+            g = &_g;
+            b = &_b;
+            storedBitmapPixels[h * mImageWidth + w] = 0xFF000000 + (*r << 16) + (*g << 8) + *b;
         }
         LOGD("h ========= %d", h);
     }
     delete distributeColorRed;
     delete distributeColorGreen;
     delete distributeColorBlue;
+    if(r == NULL) {
+        LOGD("null");
+    }
 }
 
 void GaussianBlurFilter::normalizeFilter(double sigma, int filter_size) {

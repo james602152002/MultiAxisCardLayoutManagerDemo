@@ -444,9 +444,9 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
                 final Resources resources = getResources();
                 Uri uri = new Uri.Builder()
                         .scheme(ContentResolver.SCHEME_ANDROID_RESOURCE)
-                        .authority(resources.getResourcePackageName(R.drawable.sample1))
-                        .appendPath(resources.getResourceTypeName(R.drawable.sample1))
-                        .appendPath(resources.getResourceEntryName(R.drawable.sample1))
+                        .authority(resources.getResourcePackageName(R.drawable.sample2))
+                        .appendPath(resources.getResourceTypeName(R.drawable.sample2))
+                        .appendPath(resources.getResourceEntryName(R.drawable.sample2))
                         .build();
 
 //                    final Uri uri = (Uri) cameraView.getTag();
@@ -454,7 +454,7 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
 //                    AmniXSkinSmooth skinSmooth = AmniXSkinSmooth.getInstance();
 //                try {
 ////                        Bitmap bitmap = new SoftReference<>(MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri)).get();
-//                    Bitmap bitmap = BitmapFactory.decodeResource(resources, R.drawable.sample1);
+//                    Bitmap bitmap = BitmapFactory.decodeResource(resources, R.drawable.sample2);
 ////                        skinSmooth.storeBitmap(bitmap, true);
 ////                        skinSmooth.initSdk();
 ////                        skinSmooth.startSkinSmoothness(300);
@@ -486,7 +486,7 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
                 Observable<Bitmap> observable = Observable.create(new ObservableOnSubscribe<Bitmap>() {
                     @Override
                     public void subscribe(ObservableEmitter<Bitmap> emitter) {
-                        Bitmap bitmap = BitmapFactory.decodeResource(resources, R.drawable.sample1);
+                        Bitmap bitmap = BitmapFactory.decodeResource(resources, R.drawable.sample2);
                         emitter.onNext(blur.storeBitmap(bitmap).initSdk(3, 1).getBitmap());
 //                        emitter.onNext(filterBitmap);
                     }

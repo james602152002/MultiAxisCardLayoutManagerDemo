@@ -21,13 +21,12 @@ JNIEXPORT void JNICALL
 Java_com_james602152002_multiaxiscardlayoutmanagerdemo_util_GaussianBlur_jniInitSdk(JNIEnv *env,
                                                                                     jobject obj,
                                                                                     jobject handle,
-                                                                                    jdouble sigma,
                                                                                     jint radius) {
     JniBitmap *jniBitmap = (JniBitmap *) env->GetDirectBufferAddress(handle);
     if (jniBitmap->_storedBitmapPixels == NULL) {
         return;
     }
-    GaussianBlurFilter::getInstance()->startGaussianBlur(jniBitmap, sigma, radius);
+    GaussianBlurFilter::getInstance()->startGaussianBlur(jniBitmap, radius);
 }
 
 JNIEXPORT jobject JNICALL

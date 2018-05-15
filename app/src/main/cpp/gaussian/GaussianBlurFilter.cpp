@@ -123,7 +123,7 @@ void *threadGaussianBlur(void *params) {
     pthread_exit((void *) 0);
 }
 
-void GaussianBlurFilter::startGaussianBlur(JniBitmap *jniBitmap, double sigma, int radius) {
+void GaussianBlurFilter::startGaussianBlur(JniBitmap *jniBitmap, int radius) {
     storedBitmapPixels = jniBitmap->_storedBitmapPixels;
     mImageWidth = jniBitmap->_bitmapInfo.width;
     mImageHeight = jniBitmap->_bitmapInfo.height;

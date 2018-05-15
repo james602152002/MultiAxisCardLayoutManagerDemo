@@ -12,7 +12,7 @@ class GaussianBlurFilter {
 public:
     static GaussianBlurFilter *getInstance();
 
-    void startGaussianBlur(JniBitmap *jniBitmap, double sigma, int radius);
+    void startGaussianBlur(JniBitmap *jniBitmap, int radius);
 
 //    void normalizeFilter(double sigma, int filter_size);
 //

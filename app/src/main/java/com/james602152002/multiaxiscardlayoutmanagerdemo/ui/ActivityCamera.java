@@ -475,12 +475,8 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
 //
 //                }
 
-                if (disposable != null) {
-                    disposable.dispose();
-                    disposable.clear();
-                } else {
+                if (disposable == null)
                     disposable = new CompositeDisposable();
-                }
 
                 final GaussianBlur blur = new GaussianBlur();
                 Observable<Bitmap> observable = Observable.create(new ObservableOnSubscribe<Bitmap>() {
@@ -548,7 +544,9 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        disposable.dispose();
-        disposable.clear();
+        if (disposable != null) {
+            disposable.dispose();
+            disposable.clear();
+        }
     }
 }

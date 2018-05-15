@@ -487,7 +487,7 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
                     @Override
                     public void subscribe(ObservableEmitter<Bitmap> emitter) {
                         Bitmap bitmap = BitmapFactory.decodeResource(resources, R.drawable.sample1);
-                        emitter.onNext(blur.storeBitmap(bitmap).initSdk(IPhone6ScreenResizeUtil.getPxValue(1)).getBitmap());
+                        emitter.onNext(blur.storeBitmap(bitmap).initSdk(IPhone6ScreenResizeUtil.getPxValue(10)).getBitmap());
 //                        emitter.onNext(filterBitmap);
                     }
                 });

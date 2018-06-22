@@ -444,9 +444,9 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
                 final Resources resources = getResources();
                 Uri uri = new Uri.Builder()
                         .scheme(ContentResolver.SCHEME_ANDROID_RESOURCE)
-                        .authority(resources.getResourcePackageName(R.drawable.sample2))
-                        .appendPath(resources.getResourceTypeName(R.drawable.sample2))
-                        .appendPath(resources.getResourceEntryName(R.drawable.sample2))
+                        .authority(resources.getResourcePackageName(R.drawable.sample1))
+                        .appendPath(resources.getResourceTypeName(R.drawable.sample1))
+                        .appendPath(resources.getResourceEntryName(R.drawable.sample1))
                         .build();
 
 //                    final Uri uri = (Uri) cameraView.getTag();
@@ -454,7 +454,7 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
 //                    AmniXSkinSmooth skinSmooth = AmniXSkinSmooth.getInstance();
 //                try {
 ////                        Bitmap bitmap = new SoftReference<>(MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri)).get();
-//                    Bitmap bitmap = BitmapFactory.decodeResource(resources, R.drawable.sample2);
+//                    Bitmap bitmap = BitmapFactory.decodeResource(resources, R.drawable.sample1);
 ////                        skinSmooth.storeBitmap(bitmap, true);
 ////                        skinSmooth.initSdk();
 ////                        skinSmooth.startSkinSmoothness(300);
@@ -482,8 +482,8 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
                 Observable<Bitmap> observable = Observable.create(new ObservableOnSubscribe<Bitmap>() {
                     @Override
                     public void subscribe(ObservableEmitter<Bitmap> emitter) {
-                        Bitmap bitmap = BitmapFactory.decodeResource(resources, R.drawable.sample2);
-                        emitter.onNext(blur.storeBitmap(bitmap).initSdk(IPhone6ScreenResizeUtil.getPxValue(10)).getBitmap());
+                        Bitmap bitmap = BitmapFactory.decodeResource(resources, R.drawable.sample1);
+                        emitter.onNext(blur.storeBitmap(bitmap).initSdk(IPhone6ScreenResizeUtil.getPxValue(5)).getBitmap());
 //                        emitter.onNext(filterBitmap);
                     }
                 });
@@ -524,7 +524,7 @@ public class ActivityCamera extends ActivityTranslucent implements View.OnClickL
                             }
                         });
 //                    skinSmooth.unInitSdk();
-//                }
+//                }11
                 break;
         }
     }
